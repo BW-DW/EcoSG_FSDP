@@ -62,7 +62,7 @@ function Register() {
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{
-                marginTop: 8,
+                marginTop: 5,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
@@ -70,7 +70,7 @@ function Register() {
                 <Typography variant="h5" sx={{ my: 2 }}>
                     Register
                 </Typography>
-                <Box component="form" sx={{ maxWidth: '500px' }}
+                <Box component="form" sx={{ maxWidth: '400px', width: '100%' }}
                     onSubmit={formik.handleSubmit}>
                     <TextField
                         fullWidth margin="dense" autoComplete="off"
@@ -112,18 +112,20 @@ function Register() {
                         error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
                         helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                     />
-                    <DatePicker
-                        fullWidth
-                        label="Date of Birth"
-                        inputFormat="MM/dd/yyyy"
-                        value={formik.values.dob}
-                        onChange={(value) => formik.setFieldValue('dob', value)}
-                        renderInput={(params) => <TextField {...params} fullWidth margin="dense" />}
-                    />
-                    <Button width="20px" margin="auto" variant="contained" sx={{ mt: 2 }}
-                        type="submit">
-                        Register
-                    </Button>
+                    <Box sx={{ display:'flex', justifyContent:'center', width: '100%', mt: 1}}>
+                        <DatePicker
+                            label="Date of Birth"
+                            inputFormat="MM/dd/yyyy"
+                            value={formik.values.dob}
+                            onChange={(value) => formik.setFieldValue('dob', value)}
+                            renderInput={(params) => <TextField {...params} fullWidth margin="dense" />}
+                        />
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                        <Button variant="contained" type="submit">
+                            Register
+                        </Button>
+                    </Box>
                 </Box>
 
                 <ToastContainer />
