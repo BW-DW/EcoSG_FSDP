@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
         password: yup.string().trim().min(8).max(50).required()
             .matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/,
                 "password must have at least 1 letter and 1 number"),
-        dob: yup.date().nullable().required('Date of Birth is required')
+        dob: yup.date().nullable().required('Date of Birth is required').max(new Date(), 'Date of Birth cannot be in the future')
     });
     try {
         data = await validationSchema.validate(data,

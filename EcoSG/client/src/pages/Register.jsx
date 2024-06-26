@@ -7,7 +7,7 @@ import http from '../http';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';  // Import DesktopDatePicker
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';  // Import AdapterDateFns
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';  // Import LocalizationProvider
 
 
@@ -42,7 +42,11 @@ function Register() {
             confirmPassword: yup.string().trim()
                 .required('Confirm password is required')
                 .oneOf([yup.ref('password')], 'Passwords must match'),
-            dob: yup.date().nullable().required('Date of Birth is required')  
+            dob: yup.date()
+                .required('Date of Birth is required')
+                .max(new Date(), "Date of Birth cannot be in the future")
+                .min("1945-1-1", "Date is too early")
+                .typeError('Invalid Date of Birth')
         }),
         onSubmit: (data) => {
             data.name = data.name.trim();
@@ -60,7 +64,7 @@ function Register() {
     });
 
     return (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+
             <Box sx={{
                 marginTop: 5,
                 display: 'flex',
@@ -113,13 +117,24 @@ function Register() {
                         helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                     />
                     <Box sx={{ display:'flex', justifyContent:'center', width: '100%', mt: 1}}>
-                        <DatePicker
-                            label="Date of Birth"
-                            inputFormat="MM/dd/yyyy"
-                            value={formik.values.dob}
-                            onChange={(value) => formik.setFieldValue('dob', value)}
-                            renderInput={(params) => <TextField {...params} fullWidth margin="dense" />}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker 
+                                disableFuture
+                                format="DD/MM/YYYY"
+                                label="Date Of Birth"
+                                name="dob"
+                                value={formik.values.dob}
+                                onChange={(dob) => formik.setFieldValue('dob', dob)}
+                                onBlur={() => formik.setFieldTouched('dob', true)}
+                                error={formik.touched.dob && Boolean(formik.errors.dob)}
+                                slotProps={{
+                                    textField: {
+                                        error: formik.touched.dob && Boolean(formik.errors.dob),
+                                        helperText: formik.touched.dob && formik.errors.dob
+                                    }
+                                }}
+                            />
+                        </LocalizationProvider>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                         <Button variant="contained" type="submit">
@@ -130,7 +145,7 @@ function Register() {
 
                 <ToastContainer />
             </Box>
-        </LocalizationProvider>
+
     );
 }
 
