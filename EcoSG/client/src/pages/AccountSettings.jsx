@@ -32,12 +32,12 @@ function AccountSettings() {
     useEffect(() => {
         if (user) {
             fetchUserData();
-            http.get(`/user/${user.id}/events`).then((res) => {
-                setEventsHistory(res.data);
-            });
-            http.get(`/user/${user.id}/purchases`).then((res) => {
-                setPurchaseHistory(res.data);
-            });
+        //     http.get(`/user/${user.id}/events`).then((res) => {
+        //         setEventsHistory(res.data);
+        //     });
+        //     http.get(`/user/${user.id}/purchases`).then((res) => {
+        //         setPurchaseHistory(res.data);
+        //     });
         }
     }, [user]);
 
@@ -51,7 +51,7 @@ function AccountSettings() {
         setFieldToEdit('');
     };
 
-    const handleSave = (newValue) => {
+    const handleSave = async (newValue, currentPassword) => {
         const updatedUser = { ...user, [fieldToEdit]: newValue };
         setUser(updatedUser);
 
@@ -59,17 +59,17 @@ function AccountSettings() {
             name: updatedUser.name,
             email: updatedUser.email,
             dob: updatedUser.dob,
-            password: fieldToEdit === 'password' ? newValue : undefined, // Include password only if it is being updated
+            password: fieldToEdit === 'password' ? newValue : undefined,
+            currentPassword: fieldToEdit === 'password' ? currentPassword : undefined, // Include current password only if updating password
         };
 
-        http.put(`/user/${user.id}`, updateData)
-            .then(() => {
-                toast.success(`${fieldToEdit} updated successfully`);
-                fetchUserData(); // Refetch user data after update
-            })
-            .catch((err) => {
-                toast.error(`${err.response.data.message}`);
-            });
+        try {
+            await http.put(`/user/${user.id}`, updateData);
+            toast.success(`${fieldToEdit} updated successfully`);
+            fetchUserData();
+          } catch (err) {
+            throw new Error(err.response.data.message || 'Error updating field');
+          }
     };
 
     const DeleteAccount = () => {

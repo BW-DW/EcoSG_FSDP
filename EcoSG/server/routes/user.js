@@ -6,6 +6,7 @@ const { Op } = require("sequelize");
 const yup = require("yup");
 const { sign } = require('jsonwebtoken');
 const { validateToken } = require('../middlewares/auth');
+const authMiddleware = require('../middlewares/auth');
 // const { default: Tutorials } = require('../../client/src/pages/Tutorials');
 require('dotenv').config();
 
@@ -182,7 +183,7 @@ router.delete("/:id", validateToken, async (req, res) => {
 
 router.put("/:id", validateToken, async (req, res) => {
     let id = req.params.id;
-    
+
     // Check if the user exists
     let user = await User.findByPk(id);
     if (!user) {
@@ -203,9 +204,24 @@ router.put("/:id", validateToken, async (req, res) => {
     if (data.password) {
         validationSchema = yup.object({
             password: yup.string().trim().min(8).required()
-                .matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/, "Password must have at least 1 letter and 1 number")
+                .matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/, "Password must have at least 1 letter and 1 number"),
+            currentPassword: yup.string().trim().required('Current Password is required')
         });
-        data.password = await bcrypt.hash(data.password, 10);
+
+        try {
+            data = await validationSchema.validate(data, { abortEarly: false });
+
+            // Validate current password
+            const match = await bcrypt.compare(data.currentPassword, user.password);
+            if (!match) {
+                return res.status(400).json({ message: 'Current password is incorrect' });
+            }
+
+            // Hash the new password
+            data.password = await bcrypt.hash(data.password, 10);
+        } catch (err) {
+            return res.status(400).json({ errors: err.errors });
+        }
     } else if (data.email) {
         validationSchema = yup.object({
             email: yup.string().trim().lowercase().email().max(50).required()
@@ -218,7 +234,9 @@ router.put("/:id", validateToken, async (req, res) => {
     }
 
     try {
-        data = await validationSchema.validate(data, { abortEarly: false });
+        if (!data.password) {
+            data = await validationSchema.validate(data, { abortEarly: false });
+        }
 
         let num = await User.update(data, {
             where: { id: id }
@@ -236,6 +254,9 @@ router.put("/:id", validateToken, async (req, res) => {
         res.status(400).json({ errors: err.errors });
     }
 });
+
+
+
 
 
 

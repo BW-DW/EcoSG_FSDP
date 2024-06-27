@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 // import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -9,7 +9,12 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 
 function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
+  const [errorMessage, setErrorMessage] = useState('');
+
   const validationSchema = yup.object({
+    currentPassword: field === 'password'
+        ? yup.string().trim().required('Current Password is required')
+        : yup.string(),
     value: field === 'password'
         ? yup.string().trim().min(8, 'Password must be at least 8 characters').required('Password is required').matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/,
         "Password at least 1 letter and 1 number")
@@ -24,13 +29,18 @@ function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
 
   const formik = useFormik({
     initialValues: {
+      currentPassword: '',
       value: field === 'dob' ? (initialValue ? dayjs(initialValue) : null) : initialValue || '',
       confirmPassword: '',
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      handleSave(field === 'dob' ? dayjs(values.value).toISOString() : values.value);
-      handleClose();
+    onSubmit: async (values) => {
+      try {
+        await handleSave(field === 'dob' ? dayjs(values.value).toISOString() : values.value, values.currentPassword);
+        handleClose();
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
     },
     enableReinitialize: true, // This will ensure that formik updates the form values if the initialValue prop changes
   });
@@ -38,6 +48,7 @@ function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
   useEffect(() => {
     if (open) {
       formik.resetForm();
+      setErrorMessage('');
     }
   }, [open]);
 
@@ -46,6 +57,20 @@ function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
       <DialogTitle>Edit {field}</DialogTitle>
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>
+          {field === 'password' && (
+              <TextField
+                fullWidth
+                margin="dense"
+                label="Current Password"
+                name="currentPassword"
+                type="password"
+                value={formik.values.currentPassword}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.currentPassword && Boolean(formik.errors.currentPassword)}
+                helperText={formik.touched.currentPassword && formik.errors.currentPassword}
+              />
+            )}
           {field === 'password' ? (
             <>
               <TextField
@@ -123,6 +148,11 @@ function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
               error={formik.touched.value && Boolean(formik.errors.value)}
               helperText={formik.touched.value && formik.errors.value}
             />
+          )}
+          {errorMessage && (
+            <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+              {errorMessage}
+            </Typography>
           )}
         </DialogContent>
         <DialogActions>
