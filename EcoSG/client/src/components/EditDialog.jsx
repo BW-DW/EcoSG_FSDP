@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
@@ -10,9 +11,11 @@ import dayjs from 'dayjs';
 function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
   const validationSchema = yup.object({
     value: field === 'password'
-        ? yup.string().trim().min(8, 'Password must be at least 8 characters').required('Password is required')
+        ? yup.string().trim().min(8, 'Password must be at least 8 characters').required('Password is required').matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/,
+        "Password at least 1 letter and 1 number")
         : field === 'dob'
-        ? yup.date().required('Date of Birth is required')
+        ? yup.date().required('Date of Birth is required').max(new Date(), "Date of Birth cannot be in the future")
+        .min("1945-1-1", "Date is too early").typeError('Invalid Date of Birth')
         : yup.string().trim().required(`${field} is required`),
     confirmPassword: field === 'password'
         ? yup.string().oneOf([yup.ref('value'), null], 'Passwords must match').required('Confirm Password is required')
@@ -20,14 +23,16 @@ function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
 });
 
   const formik = useFormik({
-      initialValues: { value: initialValue || '', confirmPassword: '' },
-      validationSchema,
-      onSubmit: (values) => {
-          if (field !== 'password' || values.value === values.confirmPassword) {
-              handleSave(field === 'dob' ? values.value.toISOString() : values.value);
-              handleClose();
-          }
-      },
+    initialValues: {
+      value: field === 'dob' ? (initialValue ? dayjs(initialValue) : null) : initialValue || '',
+      confirmPassword: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      handleSave(field === 'dob' ? dayjs(values.value).toISOString() : values.value);
+      handleClose();
+    },
+    enableReinitialize: true, // This will ensure that formik updates the form values if the initialValue prop changes
   });
 
   useEffect(() => {
@@ -69,12 +74,15 @@ function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
               />
             </>
           ) : field === 'dob' ? (
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Date of Birth"
-                inputFormat="dd/MM/yyyy"
+                disableFuture
+                format="DD/MM/YYYY"
+                label="Date Of Birth"
+                name="value"
                 value={formik.values.value}
                 onChange={(date) => formik.setFieldValue('value', date)}
+                onBlur={() => formik.setFieldTouched('value', true)}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -86,6 +94,23 @@ function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
                 )}
               />
             </LocalizationProvider>
+            // <LocalizationProvider dateAdapter={AdapterDateFns}>
+            //   <DatePicker
+            //     label="Date of Birth"
+            //     inputFormat="dd/MM/yyyy"
+            //     value={formik.values.value}
+            //     onChange={(date) => formik.setFieldValue('value', date)}
+            //     renderInput={(params) => (
+            //       <TextField
+            //         {...params}
+            //         fullWidth
+            //         margin="dense"
+            //         error={formik.touched.value && Boolean(formik.errors.value)}
+            //         helperText={formik.touched.value && formik.errors.value}
+            //       />
+            //     )}
+            //   />
+            // </LocalizationProvider>
           ) : (
             <TextField
               fullWidth

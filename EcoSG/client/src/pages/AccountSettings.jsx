@@ -55,9 +55,12 @@ function AccountSettings() {
         const updatedUser = { ...user, [fieldToEdit]: newValue };
         setUser(updatedUser);
 
-        const updateData = fieldToEdit === 'password' 
-        ? { password: newValue }
-        : { [fieldToEdit]: newValue };
+        const updateData = {
+            name: updatedUser.name,
+            email: updatedUser.email,
+            dob: updatedUser.dob,
+            password: fieldToEdit === 'password' ? newValue : undefined, // Include password only if it is being updated
+        };
 
         http.put(`/user/${user.id}`, updateData)
             .then(() => {
