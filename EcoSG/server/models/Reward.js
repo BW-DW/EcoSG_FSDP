@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Tutorial = sequelize.define("Tutorial", {
+    const Reward = sequelize.define("Reward", {
         title: {
             type: DataTypes.STRING(100),
             allowNull: false
@@ -7,17 +7,21 @@ module.exports = (sequelize, DataTypes) => {
         description: {
             type: DataTypes.TEXT,
             allowNull: false
-        }
+        },
+        points: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
     }, {
-        tableName: 'tutorials'
+        tableName: 'rewards'
     });
 
-    Tutorial.associate = (models) => {
-        Tutorial.belongsTo(models.User, {
+    Reward.associate = (models) => {
+        Reward.belongsTo(models.User, {
             foreignKey: "userId",
             as: 'user'
         });
     };
 
-    return Tutorial;
+    return Reward;
 }
