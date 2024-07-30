@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import AccountSettings from './pages/AccountSettings'; // Import the AccountSettings component
 import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
+import UserTable from './pages/UserTable'; // Import the UserTable component
 import http from './http';
 import UserContext from './contexts/UserContext';
 
@@ -62,6 +63,7 @@ function App() {
                   </Typography>
                 </Link>
                 <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
+                <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -96,9 +98,10 @@ function App() {
               <Route path="/edittutorial/:id" element={<EditTutorial />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/account" element={<AccountSettings />} /> {/* Add this route */}
-              <Route path="/accountdeleted" element={<AccountDeleted />} /> {/* Add this route */}
+              <Route path="/account" element={<AccountSettings />} /> 
+              <Route path="/accountdeleted" element={<AccountDeleted />} /> 
               <Route path="/form" element={<MyForm />} />
+              <Route path="/users" element={<UserTable />} /> {/* Add the UserTable route */}
             </Routes>
           </Container>
         </ThemeProvider>

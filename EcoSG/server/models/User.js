@@ -15,7 +15,12 @@ module.exports = (sequelize, DataTypes) => {
         dob: {  // Add this field
             type: DataTypes.DATEONLY,
             allowNull: true
-        }
+        },
+        role: {
+            type: DataTypes.STRING,
+            defaultValue: 'customer',
+            allowNull: false,
+        },
     }, {
         tableName: 'users'
     });

@@ -39,7 +39,8 @@ router.post("/register", async (req, res) => {
 
         // Hash passowrd
         data.password = await bcrypt.hash(data.password, 10);
-        // Create user
+        // Create user with default role 'customer'
+        data.role = 'customer';
         let result = await User.create(data);
         res.json({
             message: `Email ${result.email} was registered successfully.`
@@ -80,7 +81,9 @@ router.post("/login", async (req, res) => {
         let userInfo = {
             id: user.id,
             email: user.email,
-            name: user.name
+            name: user.name,
+            dob: user.dob, // include dob 
+            role: user.role // and roles in response
         };
         let accessToken = sign(userInfo, process.env.APP_SECRET,
             { expiresIn: process.env.TOKEN_EXPIRES_IN });
@@ -99,7 +102,9 @@ router.get("/auth", validateToken, (req, res) => {
     let userInfo = {
         id: req.user.id,
         email: req.user.email,
-        name: req.user.name
+        name: req.user.name,
+        dob: req.user.dob, // include dob
+        role: req.user.role // and role in response
     };
     res.json({
         user: userInfo
@@ -255,7 +260,35 @@ router.put("/:id", validateToken, async (req, res) => {
     }
 });
 
+// Route to change role to staff
+router.put('/:id/role/staff', async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        user.role = 'staff';
+        await user.save();
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update user role' });
+    }
+});
 
+// Route to change role to customer
+router.put('/:id/role/customer', async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        user.role = 'customer';
+        await user.save();
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update user role' });
+    }
+});
 
 
 
