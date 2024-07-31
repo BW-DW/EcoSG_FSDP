@@ -112,29 +112,33 @@ router.get("/auth", validateToken, (req, res) => {
 });
 
 
-router.get("/", async (req, res) => {
-    let condition = {};
-    let search = req.query.search;
+router.get('/', async (req, res) => {
+    const { search, filter, order } = req.query;
+    const filterCondition = filter ? { role: filter } : {};
 
-    if (search) {
-        condition[Op.or] = [
-            { name: { [Op.like]: `%${search}%` } },
-            { email: { [Op.like]: `%${search}%` } }
-        ];
-    }
+    // Determine the order condition based on user input
+    const orderCondition = order === 'ascending' ? ['id', 'ASC'] : ['id', 'DESC'];
+
+    const whereCondition = search
+        ? {
+              ...filterCondition,
+              [Op.or]: [
+                  { name: { [Op.like]: `%${search}%` } },
+                  { email: { [Op.like]: `%${search}%` } },
+                  { role: { [Op.like]: `%${search}%` } },
+              ],
+          }
+        : filterCondition;
 
     try {
-        let users = await User.findAll({
-            where: condition,
-            order: [['createdAt', 'DESC']],
-            include: { 
-                model: Tutorial, 
-                as: "Tutorials", 
-                attributes: ['title', 'description'] }
+        const users = await User.findAll({
+            where: whereCondition,
+            order: [orderCondition],
         });
         res.json(users);
     } catch (err) {
-        res.status(500).json({ message: "An error occurred while fetching users.", error: err.message });
+        console.error('Error fetching users:', err);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 

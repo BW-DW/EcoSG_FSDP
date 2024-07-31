@@ -1,9 +1,27 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Typography, Input, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Select, MenuItem, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import {
+    Box,
+    Typography,
+    Input,
+    IconButton,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Select,
+    MenuItem,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from '@mui/material';
 import { Search, Clear, Edit, Delete } from '@mui/icons-material';
-import http from '../http';
+import http from '../http'; // Your axios instance
 import UserContext from '../contexts/UserContext';
-import EditDialog from '../components/EditDialog'; // Reuse EditDialog
+import EditDialog from '../components/EditDialog';
 
 function UserTable() {
     const [users, setUsers] = useState([]);
@@ -17,43 +35,57 @@ function UserTable() {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
 
+    // Function to fetch users based on search, filter, and order
     const fetchUsers = async () => {
         try {
-            const response = await http.get('/user', { params: { search } });
+            const response = await http.get('/user', {
+                params: {
+                    search,
+                    filter,
+                    order,
+                },
+            });
             setUsers(response.data);
         } catch (error) {
-            console.error("Error fetching users:", error);
+            console.error('Error fetching users:', error);
         }
     };
 
+    // UseEffect to fetch users whenever search, filter, or order changes
     useEffect(() => {
         fetchUsers();
     }, [search, filter, order]);
 
+    // Handle search input changes
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
     };
 
+    // Handle order selection changes
     const handleOrderChange = (e) => {
         setOrder(e.target.value);
     };
 
+    // Handle filter selection changes
     const handleFilterChange = (e) => {
         setFilter(e.target.value);
     };
 
+    // Open the dialog to edit a specific field for a user
     const handleDialogOpen = (field, user) => {
         setFieldToEdit(field);
         setCurrentUser(user);
         setDialogOpen(true);
     };
 
+    // Close the edit dialog
     const handleDialogClose = () => {
         setDialogOpen(false);
         setFieldToEdit('');
         setCurrentUser(null);
     };
 
+    // Save changes made in the dialog
     const handleSave = async (newValue, currentPassword) => {
         const updatedUser = { ...currentUser, [fieldToEdit]: newValue };
         setCurrentUser(updatedUser);
@@ -74,16 +106,19 @@ function UserTable() {
         }
     };
 
+    // Open the confirm delete dialog
     const handleConfirmDialogOpen = (user) => {
         setUserToDelete(user);
         setConfirmDialogOpen(true);
     };
 
+    // Close the confirm delete dialog
     const handleConfirmDialogClose = () => {
         setConfirmDialogOpen(false);
         setUserToDelete(null);
     };
 
+    // Delete the user
     const handleDelete = async () => {
         try {
             await http.delete(`/user/${userToDelete.id}`);
@@ -101,29 +136,46 @@ function UserTable() {
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                {/* Filter Dropdown */}
                 <Select value={filter} onChange={handleFilterChange} displayEmpty>
                     <MenuItem value="">All</MenuItem>
                     <MenuItem value="staff">Staff</MenuItem>
                     <MenuItem value="customer">Customer</MenuItem>
                 </Select>
+
+                {/* Order Dropdown */}
                 <Box sx={{ mx: 2 }}>
                     Order:
                     <Select value={order} onChange={handleOrderChange} displayEmpty>
-                        <MenuItem value="ascending">Ascending</MenuItem>
-                        <MenuItem value="descending">Descending</MenuItem>
+                        <MenuItem value="ascending">Ascending (ID)</MenuItem>
+                        <MenuItem value="descending">Descending (ID)</MenuItem>
                     </Select>
                 </Box>
-                <Input value={search} placeholder="Search"
+
+                {/* Search Input */}
+                <Input
+                    value={search}
+                    placeholder="Search"
                     onChange={handleSearchChange}
-                    onKeyDown={(e) => e.key === 'Enter' && fetchUsers()} />
+                    onKeyDown={(e) => e.key === 'Enter' && fetchUsers()}
+                />
+
+                {/* Search and Clear Buttons */}
                 <IconButton color="primary" onClick={fetchUsers}>
                     <Search />
                 </IconButton>
-                <IconButton color="primary" onClick={() => { setSearch(''); fetchUsers(); }}>
+                <IconButton
+                    color="primary"
+                    onClick={() => {
+                        setSearch('');
+                        fetchUsers();
+                    }}
+                >
                     <Clear />
                 </IconButton>
             </Box>
 
+            {/* Users Table */}
             <Table>
                 <TableHead>
                     <TableRow>
@@ -142,7 +194,7 @@ function UserTable() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {users.map(user => (
+                    {users.map((user) => (
                         <TableRow key={user.id}>
                             <TableCell>{user.id}</TableCell>
                             <TableCell>{user.name}</TableCell>
@@ -168,6 +220,7 @@ function UserTable() {
                 </TableBody>
             </Table>
 
+            {/* Edit Dialog */}
             <EditDialog
                 open={dialogOpen}
                 handleClose={handleDialogClose}
@@ -176,10 +229,8 @@ function UserTable() {
                 initialValue={currentUser?.[fieldToEdit]}
             />
 
-            <Dialog
-                open={confirmDialogOpen}
-                onClose={handleConfirmDialogClose}
-            >
+            {/* Confirm Delete Dialog */}
+            <Dialog open={confirmDialogOpen} onClose={handleConfirmDialogClose}>
                 <DialogTitle>Confirm User Deletion</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
