@@ -16,6 +16,7 @@ import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDelete
 import UserTable from './pages/UserTable'; // Import the UserTable component
 import http from './http';
 import UserContext from './contexts/UserContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -63,7 +64,9 @@ function App() {
                   </Typography>
                 </Link>
                 <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
-                <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
+                {user && user.role === 'staff' && (
+                  <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
+                )}
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -101,7 +104,11 @@ function App() {
               <Route path="/account" element={<AccountSettings />} /> 
               <Route path="/accountdeleted" element={<AccountDeleted />} /> 
               <Route path="/form" element={<MyForm />} />
-              <Route path="/users" element={<UserTable />} /> {/* Add the UserTable route */}
+              <Route path="/users" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserTable />
+                </ProtectedRoute>} 
+              /> {/* Add the UserTable route and protected route */}
             </Routes>
           </Container>
         </ThemeProvider>

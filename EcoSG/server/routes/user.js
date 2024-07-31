@@ -164,9 +164,8 @@ router.delete("/:id", validateToken, async (req, res) => {
         return;
     }
 
-    // Check if the request user id matches the user id to be deleted
-    let userId = req.user.id;
-    if (user.id != userId) {
+    // Check if the request user id matches the user id or staff to be deleted
+    if (req.user.role !== 'staff' && req.user.id !== user.id) {
         res.sendStatus(403);
         return;
     }
@@ -196,9 +195,8 @@ router.put("/:id", validateToken, async (req, res) => {
         return;
     }
 
-    // Check if the request user id matches the user id to be updated
-    let userId = req.user.id;
-    if (user.id != userId) {
+    // Check if the request user id matches the user id to be updated or is same as staff user
+    if (req.user.role !== 'staff' && req.user.id !== user.id) {
         res.sendStatus(403);
         return;
     }

@@ -1,32 +1,30 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Typography, Input, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Select, MenuItem } from '@mui/material';
-import { Search, Clear } from '@mui/icons-material';
-import http from '../http'; // Ensure this is pointing to your axios instance
+import { Box, Typography, Input, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Select, MenuItem, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Search, Clear, Edit, Delete } from '@mui/icons-material';
+import http from '../http';
 import UserContext from '../contexts/UserContext';
+import EditDialog from '../components/EditDialog'; // Reuse EditDialog
 
 function UserTable() {
     const [users, setUsers] = useState([]);
     const [filter, setFilter] = useState('');
-    const [order, setOrder] = useState('descending');
+    const [order, setOrder] = useState('ascending');
     const [search, setSearch] = useState('');
     const { user } = useContext(UserContext);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [fieldToEdit, setFieldToEdit] = useState('');
+    const [currentUser, setCurrentUser] = useState(null);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
 
     const fetchUsers = async () => {
         try {
-            const response = await http.get('/user', {
-                params: {
-                    search,
-                }
-            });
+            const response = await http.get('/user', { params: { search } });
             setUsers(response.data);
         } catch (error) {
             console.error("Error fetching users:", error);
         }
     };
-
-    useEffect(() => {
-        fetchUsers();
-    }, []);
 
     useEffect(() => {
         fetchUsers();
@@ -44,24 +42,56 @@ function UserTable() {
         setFilter(e.target.value);
     };
 
-    const filteredUsers = users
-        .filter(user => user.name.toLowerCase().includes(search.toLowerCase()))
-        .filter(user => (filter ? user.role.toLowerCase() === filter : true))
-        .sort((a, b) => order === 'ascending' ? a.id - b.id : b.id - a.id);
+    const handleDialogOpen = (field, user) => {
+        setFieldToEdit(field);
+        setCurrentUser(user);
+        setDialogOpen(true);
+    };
 
-    const handleSearchKeyDown = (e) => {
-        if (e.key === 'Enter') {
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+        setFieldToEdit('');
+        setCurrentUser(null);
+    };
+
+    const handleSave = async (newValue, currentPassword) => {
+        const updatedUser = { ...currentUser, [fieldToEdit]: newValue };
+        setCurrentUser(updatedUser);
+
+        const updateData = {
+            name: updatedUser.name,
+            email: updatedUser.email,
+            dob: updatedUser.dob,
+            password: fieldToEdit === 'password' ? newValue : undefined,
+            currentPassword: fieldToEdit === 'password' ? currentPassword : undefined,
+        };
+
+        try {
+            await http.put(`/user/${currentUser.id}`, updateData);
             fetchUsers();
+        } catch (err) {
+            console.error('Error updating user:', err);
         }
     };
 
-    const handleClickSearch = () => {
-        fetchUsers();
+    const handleConfirmDialogOpen = (user) => {
+        setUserToDelete(user);
+        setConfirmDialogOpen(true);
     };
 
-    const handleClickClear = () => {
-        setSearch('');
-        fetchUsers();
+    const handleConfirmDialogClose = () => {
+        setConfirmDialogOpen(false);
+        setUserToDelete(null);
+    };
+
+    const handleDelete = async () => {
+        try {
+            await http.delete(`/user/${userToDelete.id}`);
+            fetchUsers();
+            setConfirmDialogOpen(false);
+        } catch (error) {
+            console.error('Error deleting user:', error);
+        }
     };
 
     return (
@@ -85,13 +115,11 @@ function UserTable() {
                 </Box>
                 <Input value={search} placeholder="Search"
                     onChange={handleSearchChange}
-                    onKeyDown={handleSearchKeyDown} />
-                <IconButton color="primary"
-                    onClick={handleClickSearch}>
+                    onKeyDown={(e) => e.key === 'Enter' && fetchUsers()} />
+                <IconButton color="primary" onClick={fetchUsers}>
                     <Search />
                 </IconButton>
-                <IconButton color="primary"
-                    onClick={handleClickClear}>
+                <IconButton color="primary" onClick={() => { setSearch(''); fetchUsers(); }}>
                     <Clear />
                 </IconButton>
             </Box>
@@ -102,28 +130,71 @@ function UserTable() {
                         <TableCell>ID</TableCell>
                         <TableCell>Name</TableCell>
                         <TableCell>Role</TableCell>
-                        <TableCell>Status</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Date of Birth (DoB)</TableCell>
                         <TableCell>Points</TableCell>
                         <TableCell>Hours</TableCell>
                         <TableCell>Total Events</TableCell>
                         <TableCell>Donate($)</TableCell>
+                        <TableCell>Created At</TableCell>
+                        <TableCell>Last Updated</TableCell>
+                        <TableCell>Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {filteredUsers.map(user => (
+                    {users.map(user => (
                         <TableRow key={user.id}>
                             <TableCell>{user.id}</TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.role}</TableCell>
-                            <TableCell>{user.status}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.dob}</TableCell>
                             <TableCell>{user.points !== null ? user.points : 'Null'}</TableCell>
                             <TableCell>{user.hours}</TableCell>
                             <TableCell>{user.totalEvents}</TableCell>
                             <TableCell>{user.donate !== null ? user.donate : 'Null'}</TableCell>
+                            <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+                            <TableCell>{new Date(user.updatedAt).toLocaleString()}</TableCell>
+                            <TableCell>
+                                <IconButton color="primary" onClick={() => handleDialogOpen('name', user)}>
+                                    <Edit />
+                                </IconButton>
+                                <IconButton color="error" onClick={() => handleConfirmDialogOpen(user)}>
+                                    <Delete />
+                                </IconButton>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
+
+            <EditDialog
+                open={dialogOpen}
+                handleClose={handleDialogClose}
+                field={fieldToEdit}
+                handleSave={handleSave}
+                initialValue={currentUser?.[fieldToEdit]}
+            />
+
+            <Dialog
+                open={confirmDialogOpen}
+                onClose={handleConfirmDialogClose}
+            >
+                <DialogTitle>Confirm User Deletion</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this user? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmDialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
