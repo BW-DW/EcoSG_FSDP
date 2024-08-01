@@ -1,48 +1,28 @@
 import './App.css';
-import React, { useState, useEffect } from 'react';
-// import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, AppBar, Toolbar, Typography, Box, Button, Menu, MenuItem } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import MyTheme from './themes/MyTheme';
-import Rewards from './pages/Rewards';
-import AddReward from './pages/AddReward';
-import EditReward from './pages/EditReward';
+import CreateEvent from './pages/CreateEvent';
 import MyForm from './pages/MyForm';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import AccountSettings from './pages/AccountSettings'; // Import the AccountSettings component
-import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
-import UserTable from './pages/UserTable'; // Import the UserTable component
-import UserTableEdit from './pages/UserTableEdit'; // Import UserTableEdit component
-import AddAnnouncement from './pages/AddAnnouncement'; // Import AddAnnouncement component
-import EditAnnouncement from './pages/EditAnnouncement'; // Import EditAnnouncement component
-import Announcements from './pages/Announcements'; // Import Announcements component
-import Homepage from './pages/Homepage';
-// import AnnouncementStaff from './pages/AnnouncementStaff'; // Import AnnouncementStaff component
+import Events from './pages/Events';
+import EditEvent from './pages/EditEvent';  // Ensure this import is present
+import EventDetails from './pages/EventDetails'; // Add this import
+import AdminEvents from './pages/AdminEvents'; // Add this import
+import AdminEventDetails from './pages/AdminEventDetails'; // Add this import
+import CompletedEvents from './pages/CompletedEvents';
 import http from './http';
 import UserContext from './contexts/UserContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import CreateFacilities from './pages/CreateFacilities';
-import EditFacilities from './pages/EditFacilities';
-import Facilities from "./pages/Facilities";
-import ContactUs from "./pages/ContactUs";
-import ContactMessages from "./pages/ContactMessages";
-import UserFacilities from './pages/UserFacilities';
-import Donations from './pages/Donations';
-import Makedon from './pages/makeDon';
-import Viewdon from './pages/viewDonations';
-import Updatedon from './pages/updateDonations';
-import Checkout from './pages/checkout';
-import ReceiptPage from './pages/receipt';
-import UserDonation from './pages/userDonation';
-import Viewdonstaff from './pages/viewDonStaff';
 
 function App() {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [facilityAnchorEl, setFacilityAnchorEl] = useState(null); // For facility dropdown
   const [donationAnchorEl, setDonationAnchorEl] = useState(null); // For donation dropdown
+  const open = Boolean(anchorEl);
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
@@ -88,6 +68,14 @@ function App() {
   const logout = () => {
     localStorage.clear();
     window.location = "/";
+  };
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -206,28 +194,59 @@ function App() {
                   </>
                 )}
 
+                <Typography
+                  aria-controls={open ? 'basic-menu' : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={open ? 'true' : undefined}
+                  onClick={handleClick}
+                  sx={{ cursor: 'pointer', mr: 2 }}
+                >
+                  Events
+                </Typography>
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                  }}
+                >
+                  <MenuItem onClick={handleClose}>
+                    <Link to="/events" style={{ textDecoration: 'none', color: 'inherit' }}>
+                      View Events
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleClose}>
+                    <Link to="/createevent" style={{ textDecoration: 'none', color: 'inherit' }}>
+                      Create Event
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleClose}>
+                    <Link to="/completedevents" style={{ textDecoration: 'none', color: 'inherit' }}>
+                      Completed Events                   
+                    </Link>
+                  </MenuItem>
+                  {user && (
+                    <MenuItem onClick={handleClose}>
+                      <Link to="/admin/events" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        Admin Events
+                      </Link>
+                    </MenuItem>
+                  )}
+                </Menu>
                 <Box sx={{ flexGrow: 1 }}></Box>
 
                 {user && (
                   <>
-                    <Typography onClick={handleMenuOpen} style={{ cursor: 'pointer' }}>
-                      {user.name}
-                    </Typography>
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem onClick={handleAccountSettings}>Account Settings</MenuItem>
-                      <MenuItem onClick={logout}>Logout</MenuItem>
-                    </Menu>
+                    <Typography>{user.name}</Typography>
+                    <Button onClick={logout}>Logout</Button>
                   </>
-                )
-                }
+                )}
                 {!user && (
                   <>
-                    <Link to="/register" ><Typography>Register</Typography></Link>
-                    <Link to="/login" ><Typography>Login</Typography></Link>
+                    <Link to="/register"><Typography>Register</Typography></Link>
+                    <Link to="/login"><Typography>Login</Typography></Link>
                   </>
                 )}
               </Toolbar>
@@ -236,10 +255,9 @@ function App() {
 
           <Container>
             <Routes>
-              <Route path="/" element={<Homepage />} />
-              <Route path="/rewards" element={<Rewards />} />
-              <Route path="/addreward" element={<AddReward />} />
-              <Route path="/editreward/:id" element={<EditReward />} />
+              <Route path="/" element={<Events />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/createevent" element={<CreateEvent />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/account" element={<AccountSettings />} />
@@ -278,6 +296,11 @@ function App() {
                   <UserDonation />
                 </ProtectedRoute>}
               />
+              <Route path="/event/:id" element={<EventDetails />} />
+              <Route path="/editevent/:id" element={<EditEvent />} />
+              <Route path="/admin/events" element={<AdminEvents />} />
+              <Route path="/admin/event/:id" element={<AdminEventDetails />} />
+              <Route path="/completedevents" element={<CompletedEvents />} />
             </Routes>
           </Container>
         </ThemeProvider>
