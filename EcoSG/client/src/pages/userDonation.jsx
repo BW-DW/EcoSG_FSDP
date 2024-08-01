@@ -189,7 +189,6 @@ function UserDonation() {
                         <TableCell>Role</TableCell>
                         <TableCell>Email</TableCell>
                         <TableCell>Date of Birth (DoB)</TableCell>
-                        <TableCell>Points</TableCell>
                         <TableCell>Donations ($)</TableCell>
                         <TableCell>View User's Donations</TableCell>
                     </TableRow>
@@ -202,8 +201,7 @@ function UserDonation() {
                             <TableCell>{user.role}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.dob}</TableCell>
-                            <TableCell>{user.points !== null ? user.points : '0'}</TableCell>
-                            <TableCell>{user.donate !== null ? user.donate : '0'}</TableCell>
+                            <TableCell>{user.donation !== null ? user.donation : '0'}</TableCell>
                             <TableCell>
                                 <Link to={`/viewdonation/${user.id}`}>
                                     <Button variant="contained">

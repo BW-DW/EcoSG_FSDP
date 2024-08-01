@@ -204,7 +204,7 @@ function UserTable() {
                             <TableCell>{user.points !== null ? user.points : 'Null'}</TableCell>
                             <TableCell>{user.hours}</TableCell>
                             <TableCell>{user.totalEvents}</TableCell>
-                            <TableCell>{user.donate !== null ? user.donate : 'Null'}</TableCell>
+                            <TableCell>{user.donation !== null ? user.donation : 'Null'}</TableCell>
                             <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
                             <TableCell>{new Date(user.updatedAt).toLocaleString()}</TableCell>
                             <TableCell>

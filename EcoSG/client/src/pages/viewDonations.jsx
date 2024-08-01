@@ -13,6 +13,19 @@ function Viewdon() {
     const [search, setSearch] = useState('');
     const { user } = useContext(UserContext);
 
+    const updateDonation = async (userId, donationAmount) => {
+        try {
+          const response = await http.put(`/user/${userId}`, {
+            name: user.name,
+            donation: donationAmount
+          });
+          console.log(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+    
+
 
     const onSearchChange = (e) => {
         setSearch(e.target.value);
@@ -135,6 +148,9 @@ function Viewdon() {
                                 </Typography>
                                 <Typography variant="h5" sx={{ my: 2 }}>
                                     Make a donation <Link to="/makeDonations">here</Link>
+                                </Typography>
+                                <Typography sx={{ color: 'white' }}>
+                                {user.id}
                                 </Typography>
         </Box>
     );

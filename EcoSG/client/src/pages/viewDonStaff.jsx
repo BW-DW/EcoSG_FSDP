@@ -26,13 +26,13 @@ function Viewdonstaff() {
     };
 
     const getTutorials = () => {
-        http.get('/tutorial').then((res) => {
+        http.get(`/tutorial/userId/${id}`).then((res) => {
             setTutorialList(res.data);
         });
     };
 
     const searchTutorials = () => {
-        http.get(`/tutorial?search=${search}`).then((res) => {
+        http.get(`/tutorial/userId/${id}?search=${search}`).then((res) => {
             setTutorialList(res.data);
         });
     };
@@ -40,6 +40,17 @@ function Viewdonstaff() {
     useEffect(() => {
         getTutorials();
     }, []);
+
+    // const updateDonation = async (userId, donationAmount) => {
+    //     try {
+    //       const response = await http.put(`/user/${userId}`, {
+    //         donation: donationAmount,
+    //       });
+    //       console.log(response.data);
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //   };
 
     const onSearchKeyDown = (e) => {
         if (e.key === "Enter") {
@@ -76,18 +87,17 @@ function Viewdonstaff() {
                 </IconButton>
                 <Box sx={{ flexGrow: 1 }} />
                 {
-                    user && (
                         <Link to="/makedonations" style={{ textDecoration: 'none' }}>
                             <Button variant='contained'>
                                 Donate
                             </Button>
                         </Link>
-                    )
+                    
                 }
             </Box>
             <Grid container spacing={2}>
                 {
-                    tutorialList.map((tutorial, i) => {
+                    tutorialList.slice().reverse().map((tutorial, i) => {
                         return (
                             <Grid item xs={12} md={6} lg={4} key={tutorial.id}>
                                 <Typography sx={{ color: 'white' }}>
@@ -95,7 +105,6 @@ function Viewdonstaff() {
                                 </Typography>
                                 
                                 {
-                                user && user.id === tutorial.userId && (
                                 <Card>
                                     <CardContent>
                                         <Box sx={{ display: 'flex', mb: 1 }}>
@@ -103,13 +112,12 @@ function Viewdonstaff() {
                                                 {tutorial.amount}
                                             </Typography>
                                             {
-                                                user && user.id === tutorial.userId && (
                                                     <Link to={`/updatedonations/${tutorial.id}`}>
                                                         <IconButton color="primary" sx={{ padding: '4px' }}>
                                                             <Edit />
                                                         </IconButton>
                                                     </Link>
-                                                )
+                                                
                                             }
                                         </Box>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}
@@ -131,7 +139,7 @@ function Viewdonstaff() {
                                         </Typography>
                                     </CardContent>
                                 </Card>
-                                )}
+                                }
                             </Grid>
                         );
                     })
