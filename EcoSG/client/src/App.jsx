@@ -17,6 +17,12 @@ import UserTable from './pages/UserTable'; // Import the UserTable component
 import http from './http';
 import UserContext from './contexts/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Donations from './pages/Donations';
+import Makedon from './pages/makeDon';
+import Viewdon from './pages/viewDonations';
+import Updatedon from './pages/updateDonations';
+import Checkout from './pages/checkout';
+import ReceiptPage from './pages/receipt';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -67,6 +73,15 @@ function App() {
                 {user && user.role === 'staff' && (
                   <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
                 )}
+                {user && user.role === 'staff' && (
+                  <Link to="/userdonations" style={{ textDecoration: 'none' }}><Typography>Users' Donations</Typography></Link>
+                )}
+                {user && user.role === 'customer' && (
+                  <Link to="/donations" style={{ textDecoration: 'none' }}><Typography>Make a Donation</Typography></Link>
+                )}
+                {user && user.role === 'customer' && (
+                  <Link to="/viewdonations" style={{ textDecoration: 'none' }}><Typography>View Current Donations</Typography></Link>
+                )}
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -104,6 +119,13 @@ function App() {
               <Route path="/account" element={<AccountSettings />} /> 
               <Route path="/accountdeleted" element={<AccountDeleted />} /> 
               <Route path="/form" element={<MyForm />} />
+              <Route path="/donations" element={<Donations />} />
+              <Route path="/makedonations" element={<Makedon />} />
+              <Route path="/makedonations/:id" element={<Makedon />} />
+              <Route path="/viewdonations" element={<Viewdon />} />
+              <Route path="/updatedonations/:id" element={<Updatedon />} />
+              <Route path="/checkout/:id" element={<Checkout />} />
+              <Route path="/receipt/:id" element={<ReceiptPage />} />
               <Route path="/users" element={
                 <ProtectedRoute requiredRole="staff">
                   <UserTable />

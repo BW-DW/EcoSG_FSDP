@@ -10,7 +10,7 @@ router.post("/", validateToken, async (req, res) => {
     data.userId = req.user.id;
     // Validate request body
     let validationSchema = yup.object({
-        title: yup.string().trim().min(3).max(100).required(),
+        amount: yup.number().required(),
         description: yup.string().trim().min(3).max(500).required()
     });
     try {
@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
     let search = req.query.search;
     if (search) {
         condition[Op.or] = [
-            { title: { [Op.like]: `%${search}%` } },
+            { amount: { [Op.like]: `%${search}%` } },
             { description: { [Op.like]: `%${search}%` } }
         ];
     }
@@ -76,7 +76,7 @@ router.put("/:id", validateToken, async (req, res) => {
     let data = req.body;
     // Validate request body
     let validationSchema = yup.object({
-        title: yup.string().trim().min(3).max(100),
+        amount: yup.number(),
         description: yup.string().trim().min(3).max(500)
     });
     try {

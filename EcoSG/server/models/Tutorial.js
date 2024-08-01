@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
     const Tutorial = sequelize.define("Tutorial", {
-        title: {
-            type: DataTypes.STRING(100),
+        amount: {
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         description: {
