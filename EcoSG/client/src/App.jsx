@@ -29,6 +29,14 @@ import Facilities from "./pages/Facilities";
 import ContactUs from "./pages/ContactUs";
 import ContactMessages from "./pages/ContactMessages";
 import UserFacilities from './pages/UserFacilities';
+import Donations from './pages/Donations';
+import Makedon from './pages/makeDon';
+import Viewdon from './pages/viewDonations';
+import Updatedon from './pages/updateDonations';
+import Checkout from './pages/checkout';
+import ReceiptPage from './pages/receipt';
+import UserDonation from './pages/userDonation';
+import Viewdonstaff from './pages/viewDonStaff';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -84,7 +92,16 @@ function App() {
                 <Link to="/contactus" ><Typography>Contact Us</Typography></Link>
                 <Link to="/contactmessages" ><Typography>Contact Messages</Typography></Link>
                 <Link to="/userfacilities" ><Typography>User Facilities</Typography></Link>
-                <Box sx={{ flexGrow: 1 }}></Box> 
+                {user && user.role === 'staff' && (
+                  <Link to="/userdonations" style={{ textDecoration: 'none' }}><Typography>Users' Donations</Typography></Link>
+                )}
+                {user && user.role === 'customer' && (
+                  <Link to="/donations" style={{ textDecoration: 'none' }}><Typography>Make a Donation</Typography></Link>
+                )}
+                {user && user.role === 'customer' && (
+                  <Link to="/viewdonations" style={{ textDecoration: 'none' }}><Typography>View Current Donations</Typography></Link>
+                )}
+                <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
                     <Typography onClick={handleMenuOpen} style={{ cursor: 'pointer' }}>
@@ -122,6 +139,14 @@ function App() {
               <Route path="/account" element={<AccountSettings />} /> 
               <Route path="/accountdeleted" element={<AccountDeleted />} /> 
               <Route path="/form" element={<MyForm />} />
+              <Route path="/donations" element={<Donations />} />
+              <Route path="/makedonations" element={<Makedon />} />
+              <Route path="/makedonations/:id" element={<Makedon />} />
+              <Route path="/viewdonations" element={<Viewdon />} />
+              <Route path="/viewdonation/:id" element={<Viewdonstaff />} />
+              <Route path="/updatedonations/:id" element={<Updatedon />} />
+              <Route path="/checkout/:id" element={<Checkout />} />
+              <Route path="/receipt/:id" element={<ReceiptPage />} />
               <Route path="/users" element={
                 <ProtectedRoute requiredRole="staff">
                   <UserTable />
@@ -142,6 +167,11 @@ function App() {
               {/* <Route path={"/contactMessages"} element={<ContactMessages />} /> */}
               <Route path={"/contactmessages"} element={<ContactMessages/>}/>
               <Route path={"/userfacilities"} element={<UserFacilities />} />
+              <Route path="/userdonations" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserDonation />
+                </ProtectedRoute>} 
+              />
             </Routes>
           </Container>
         </ThemeProvider>

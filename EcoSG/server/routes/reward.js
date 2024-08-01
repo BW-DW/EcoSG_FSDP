@@ -13,6 +13,8 @@ router.post("/", validateToken, async (req, res) => {
         title: yup.string().trim().min(3).max(100).required(),
         description: yup.string().trim().min(3).max(500).required(),
         points: yup.number().integer().min(1).max(100),
+        amount: yup.number().required(),
+        description: yup.string().trim().min(3).max(500).required()
     });
     try {
         data = await validationSchema.validate(data,
@@ -32,7 +34,9 @@ router.get("/", async (req, res) => {
         condition[Op.or] = [
             { title: { [Op.like]: `%${search}%` } },
             { description: { [Op.like]: `%${search}%` } },
-            { points: { [Op.like]: `%${search}%`} }
+            { points: { [Op.like]: `%${search}%`} },
+            { amount: { [Op.like]: `%${search}%` } },
+            { description: { [Op.like]: `%${search}%` } }
         ];
     }
     // You can add condition for other columns here
@@ -81,6 +85,8 @@ router.put("/:id", validateToken, async (req, res) => {
         title: yup.string().trim().min(3).max(100),
         description: yup.string().trim().min(3).max(500),
         points: yup.number().integer().min(1).max(100),
+        amount: yup.number(),
+        description: yup.string().trim().min(3).max(500)
     });
     try {
         data = await validationSchema.validate(data,
