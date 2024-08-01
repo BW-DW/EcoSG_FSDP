@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const { User, Tutorial } = require('../models');
+const { User, Reward } = require('../models');
 const { Op } = require("sequelize");
 const yup = require("yup");
 const { sign } = require('jsonwebtoken');
 const { validateToken } = require('../middlewares/auth');
 const authMiddleware = require('../middlewares/auth');
-// const { default: Tutorials } = require('../../client/src/pages/Tutorials');
+// const { default: Rewards } = require('../../client/src/pages/Rewards');
 require('dotenv').config();
 
 

@@ -5,9 +5,9 @@ import { Container, AppBar, Toolbar, Typography, Box, Button, Menu, MenuItem } f
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import MyTheme from './themes/MyTheme';
-import Tutorials from './pages/Tutorials';
-import AddTutorial from './pages/AddTutorial';
-import EditTutorial from './pages/EditTutorial';
+import Rewards from './pages/Rewards';
+import AddReward from './pages/AddReward';
+import EditReward from './pages/EditReward';
 import MyForm from './pages/MyForm';
 import Register from './pages/Register';
 import Login from './pages/Login';
@@ -58,12 +58,8 @@ function App() {
           <AppBar position="static" className="AppBar">
             <Container>
               <Toolbar disableGutters={true}>
-                <Link to="/">
-                  <Typography variant="h6" component="div">
-                    EcoSG
-                  </Typography>
-                </Link>
-                <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
+                <Link to="/"><Typography variant="h6" component="div">EcoSG</Typography></Link>
+                <Link to="/rewards" ><Typography>Rewards</Typography></Link>
                 {user && user.role === 'staff' && (
                   <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
                 )}
@@ -95,10 +91,10 @@ function App() {
 
           <Container>
             <Routes>
-              <Route path="/" element={<Tutorials />} />
-              <Route path="/tutorials" element={<Tutorials />} />
-              <Route path="/addtutorial" element={<AddTutorial />} />
-              <Route path="/edittutorial/:id" element={<EditTutorial />} />
+              <Route path="/" element={<Rewards />} />
+              <Route path="/rewards" element={<Rewards />} />
+              <Route path="/addreward" element={<AddReward />} />
+              <Route path="/editreward/:id" element={<EditReward />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/account" element={<AccountSettings />} /> 
