@@ -17,6 +17,16 @@ import UserTable from './pages/UserTable'; // Import the UserTable component
 import http from './http';
 import UserContext from './contexts/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
+<<<<<<< Updated upstream
+=======
+import Donations from './pages/Donations';
+import Makedon from './pages/makeDon';
+import Viewdon from './pages/viewDonations';
+import Updatedon from './pages/updateDonations';
+import Checkout from './pages/checkout';
+import ReceiptPage from './pages/receipt';
+import UserDonation from './pages/userDonations';
+>>>>>>> Stashed changes
 
 function App() {
   const [user, setUser] = useState(null);
@@ -109,6 +119,11 @@ function App() {
                   <UserTable />
                 </ProtectedRoute>} 
               /> {/* Add the UserTable route and protected route */}
+              <Route path="/userdonations" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserDonation />
+                </ProtectedRoute>} 
+              />
             </Routes>
           </Container>
         </ThemeProvider>
