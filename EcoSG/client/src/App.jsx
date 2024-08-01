@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import AccountSettings from './pages/AccountSettings'; // Import the AccountSettings component
 import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
 import UserTable from './pages/UserTable'; // Import the UserTable component
+import UserTableEdit from './pages/UserTableEdit'; // Import UserTableEdit component
 import AddAnnouncement from './pages/AddAnnouncement'; // Import AddAnnouncement component
 import EditAnnouncement from './pages/EditAnnouncement'; // Import EditAnnouncement component
 import Announcements from './pages/Announcements'; // Import Announcements component
@@ -69,7 +70,7 @@ function App() {
                   <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
                 )}
                 {user && (
-                  <Link to="/Announcements" ><Typography>Announcements</Typography></Link>
+                  <Link to="/announcements" ><Typography>Announcements</Typography></Link>
                 )}
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
@@ -113,9 +114,13 @@ function App() {
                   <UserTable />
                 </ProtectedRoute>} 
               /> {/* Add the UserTable route and protected route */}
+              <Route path="/users/edit/:id" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserTableEdit />
+                </ProtectedRoute>} /> {/* Add the UserTableEdit route */}
               <Route path="/addannouncement" element={<AddAnnouncement />} />
               <Route path="/editannouncement/:id" element={<EditAnnouncement />} />
-              <Route path="/Announcements" element={<Announcements />} />
+              <Route path="/announcements" element={<Announcements />} />
               {/* <Route path="/announcementsstaff" element={<AnnouncementStaff />} /> */}
             </Routes>
           </Container>
