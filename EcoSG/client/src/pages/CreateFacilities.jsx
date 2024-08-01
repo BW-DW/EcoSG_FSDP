@@ -34,11 +34,11 @@ function CreateFacilities() {
         }),
         onSubmit: (data) => {
             if (imageFile) {
+                console.log(imageFile)
                 data.imageFile = imageFile;
             }
             data.name = data.name.trim();
             data.description = data.description.trim();
-            
             console.log('Submitting data:', data);  // Log the data being sent
             
             http.post("/facilities", data)

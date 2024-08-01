@@ -41,6 +41,8 @@ import Viewdonstaff from './pages/viewDonStaff';
 function App() {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [facilityAnchorEl, setFacilityAnchorEl] = useState(null); // For facility dropdown
+  const [donationAnchorEl, setDonationAnchorEl] = useState(null); // For donation dropdown
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
@@ -56,6 +58,22 @@ function App() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleFacilityMenuOpen = (event) => {
+    setFacilityAnchorEl(event.currentTarget);
+  };
+
+  const handleFacilityMenuClose = () => {
+    setFacilityAnchorEl(null);
+  };
+
+  const handleDonationMenuOpen = (event) => {
+    setDonationAnchorEl(event.currentTarget);
+  };
+
+  const handleDonationMenuClose = () => {
+    setDonationAnchorEl(null);
   };
 
   const handleAccountSettings = () => {
@@ -81,27 +99,115 @@ function App() {
               <Toolbar disableGutters={true}>
                 <Link to="/"><Typography variant="h6" component="div">EcoSG</Typography></Link>
                 <Link to="/rewards" ><Typography>Rewards</Typography></Link>
+                <Link to="/announcements" ><Typography>Announcements</Typography></Link>
                 {user && user.role === 'staff' && (
                   <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
                 )}
-                {user && (
-                  <Link to="/announcements" ><Typography>Announcements</Typography></Link>
+                
+
+                  {/* Facility Dropdown for staff*/ }
+                {user && user.role === 'staff' && (
+                  <>
+                    <Typography
+                      onClick={handleFacilityMenuOpen}
+                      style={{ cursor: 'pointer', marginRight: 16 }}
+                    >
+                      Facility
+                    </Typography>
+                    <Menu
+                      anchorEl={facilityAnchorEl}
+                      open={Boolean(facilityAnchorEl)}
+                      onClose={handleFacilityMenuClose}
+                    >
+                      {user.role === 'staff' && (
+                        <MenuItem
+                          onClick={() => {
+                            handleFacilityMenuClose();
+                            window.location = '/createfacilities';
+                          }}
+                        >
+                          Create Facilities
+                        </MenuItem>
+                      )}
+                      <MenuItem
+                        onClick={() => {
+                          handleFacilityMenuClose();
+                          window.location = '/facilities';
+                        }}
+                      >
+                        Facilities
+                      </MenuItem>
+                    </Menu>
+                  </>
                 )}
-                <Link to="/createfacilities" ><Typography>Create Facilities</Typography></Link>
-                <Link to="/facilities" ><Typography>Facilities</Typography></Link>
-                <Link to="/contactus" ><Typography>Contact Us</Typography></Link>
-                <Link to="/contactmessages" ><Typography>Contact Messages</Typography></Link>
-                <Link to="/userfacilities" ><Typography>User Facilities</Typography></Link>
+
+                {user && user.role === 'customer' && (
+                  <Link to="/facilities" ><Typography>Facilities</Typography></Link>
+                )}
+
+                {user && user.role === 'customer' && (
+                  <Link to="/contactus" ><Typography>Contact Us</Typography></Link>
+                )}
+                {user && user.role === 'staff' && (
+                  <Link to="/contactmessages" ><Typography>Contact Messages</Typography></Link>
+                )}
+
+                {/* <Link to="/userfacilities" ><Typography>User Facilities</Typography></Link> */}
+
                 {user && user.role === 'staff' && (
                   <Link to="/userdonations" style={{ textDecoration: 'none' }}><Typography>Users' Donations</Typography></Link>
                 )}
-                {user && user.role === 'customer' && (
-                  <Link to="/donations" style={{ textDecoration: 'none' }}><Typography>Make a Donation</Typography></Link>
+
+                {/* Donations Dropdown */}
+                {user && user.role === 'customer' &&(
+                  <>
+                    <Typography
+                      onClick={handleDonationMenuOpen}
+                      style={{ cursor: 'pointer', marginRight: 16 }}
+                    >
+                      Donations
+                    </Typography>
+                    <Menu
+                      anchorEl={donationAnchorEl}
+                      open={Boolean(donationAnchorEl)}
+                      onClose={handleDonationMenuClose}
+                    >
+                      {user.role === 'customer' && (
+                        <MenuItem
+                          onClick={() => {
+                            handleDonationMenuClose();
+                            window.location = '/donations';
+                          }}
+                        >
+                          Make a Donation
+                        </MenuItem>
+                      )}
+                      {user.role === 'customer' && (
+                        <MenuItem
+                          onClick={() => {
+                            handleDonationMenuClose();
+                            window.location = '/viewdonations';
+                          }}
+                        >
+                          View Current Donations
+                        </MenuItem>
+                      )}
+                      {user.role === 'staff' && (
+                        <MenuItem
+                          onClick={() => {
+                            handleDonationMenuClose();
+                            window.location = '/userdonations';
+                          }}
+                        >
+                          Users' Donations
+                        </MenuItem>
+                      )}
+                    </Menu>
+                  </>
                 )}
-                {user && user.role === 'customer' && (
-                  <Link to="/viewdonations" style={{ textDecoration: 'none' }}><Typography>View Current Donations</Typography></Link>
-                )}
+
                 <Box sx={{ flexGrow: 1 }}></Box>
+
                 {user && (
                   <>
                     <Typography onClick={handleMenuOpen} style={{ cursor: 'pointer' }}>
@@ -136,8 +242,8 @@ function App() {
               <Route path="/editreward/:id" element={<EditReward />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/account" element={<AccountSettings />} /> 
-              <Route path="/accountdeleted" element={<AccountDeleted />} /> 
+              <Route path="/account" element={<AccountSettings />} />
+              <Route path="/accountdeleted" element={<AccountDeleted />} />
               <Route path="/form" element={<MyForm />} />
               <Route path="/donations" element={<Donations />} />
               <Route path="/makedonations" element={<Makedon />} />
@@ -150,7 +256,7 @@ function App() {
               <Route path="/users" element={
                 <ProtectedRoute requiredRole="staff">
                   <UserTable />
-                </ProtectedRoute>} 
+                </ProtectedRoute>}
               /> {/* Add the UserTable route and protected route */}
               <Route path="/users/edit/:id" element={
                 <ProtectedRoute requiredRole="staff">
@@ -165,12 +271,12 @@ function App() {
               <Route path={"/facilities"} element={<Facilities />} />
               <Route path={"/contactus"} element={<ContactUs />} />
               {/* <Route path={"/contactMessages"} element={<ContactMessages />} /> */}
-              <Route path={"/contactmessages"} element={<ContactMessages/>}/>
+              <Route path={"/contactmessages"} element={<ContactMessages />} />
               <Route path={"/userfacilities"} element={<UserFacilities />} />
               <Route path="/userdonations" element={
                 <ProtectedRoute requiredRole="staff">
                   <UserDonation />
-                </ProtectedRoute>} 
+                </ProtectedRoute>}
               />
             </Routes>
           </Container>

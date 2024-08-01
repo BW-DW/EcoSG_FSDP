@@ -131,10 +131,10 @@ function UserTable() {
                         <TableCell>Email</TableCell>
                         <TableCell>Date of Birth</TableCell>
                         <TableCell>Role</TableCell>
-                        <TableCell>Points</TableCell>
+                        {/* <TableCell>Points</TableCell>
                         <TableCell>Hours</TableCell>
                         <TableCell>Total Events</TableCell>
-                        <TableCell>Donate</TableCell>
+                        <TableCell>Donate</TableCell> */}
                         <TableCell>Edit</TableCell>
                         <TableCell>Delete</TableCell>
                     </TableRow>
@@ -147,10 +147,10 @@ function UserTable() {
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.dob}</TableCell>
                             <TableCell>{user.role}</TableCell>
-                            <TableCell>{user.points}</TableCell>
+                            {/* <TableCell>{user.points}</TableCell>
                             <TableCell>{user.hours}</TableCell>
                             <TableCell>{user.totalEvents}</TableCell>
-                            <TableCell>{user.donate}</TableCell>
+                            <TableCell>{user.donate}</TableCell> */}
                             <TableCell>
                                 <IconButton onClick={() => navigate(`/users/edit/${user.id}`)}>
                                     <Edit />
