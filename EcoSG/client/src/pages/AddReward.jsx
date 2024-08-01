@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { Box, Typography, TextField, Button, Grid } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import http from '../http';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddReward() {
     const navigate = useNavigate();
+    const [imageFile, setImageFile] = useState(null);
 
     const formik = useFormik({
         initialValues: {
@@ -30,6 +33,9 @@ function AddReward() {
                 .required('Points is required'),
         }),
         onSubmit: (data) => {
+            if (imageFile) {
+                data.imageFile = imageFile;
+            }
             data.title = data.title.trim();
             data.description = data.description.trim();
             data.points = data.points;
@@ -40,6 +46,30 @@ function AddReward() {
                 });
         }
     });
+
+    const onFileChange = (e) => {
+        let file = e.target.files[0];
+        if (file) {
+            if (file.size > 1024 * 1024) {
+                toast.error('Maximum file size is 1MB');
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('file', file);
+            http.post('/file/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+                .then((res) => {
+                    setImageFile(res.data.filename);
+                })
+                .catch(function (error) {
+                    console.log(error.response);
+                });
+        }
+    };
 
     return (
         <Box>
@@ -86,6 +116,8 @@ function AddReward() {
                     </Button>
                 </Box>
             </Box>
+
+            <ToastContainer />
         </Box>
     );
 }

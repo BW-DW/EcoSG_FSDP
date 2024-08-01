@@ -10,14 +10,13 @@ const authMiddleware = require('../middlewares/auth');
 // const { default: Rewards } = require('../../client/src/pages/Rewards');
 require('dotenv').config();
 
-
 router.post("/register", async (req, res) => {
     let data = req.body;
     // Validate request body
     let validationSchema = yup.object({
         name: yup.string().trim().min(3).max(50).required()
             .matches(/^[a-zA-Z '-,.]+$/,
-                "Only letters, spaces and characters: ' - , . are allowed"),
+                "name only allow letters, spaces and characters: ' - , ."),
         email: yup.string().trim().lowercase().email().max(50).required(),
         password: yup.string().trim().min(8).max(50).required()
             .matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/,
@@ -296,4 +295,3 @@ router.put('/:id/role/customer', async (req, res) => {
 
 
 module.exports = router;
-

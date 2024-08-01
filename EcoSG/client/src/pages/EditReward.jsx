@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { Box, Typography, TextField, Button, Grid } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import http from '../http';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function EditReward() {
     const { id } = useParams();
@@ -15,6 +17,7 @@ function EditReward() {
         description: "",
         points: "",
     });
+    const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -43,6 +46,9 @@ function EditReward() {
                 .required('Points is required'),
         }),
         onSubmit: (data) => {
+            if (imageFile) {
+                data.imageFile = imageFile;
+            }
             data.title = data.title.trim();
             data.description = data.description.trim();
             data.points=data.points;
@@ -71,6 +77,30 @@ function EditReward() {
                 navigate("/rewards");
             });
     }
+
+    const onFileChange = (e) => {
+        let file = e.target.files[0];
+        if (file) {
+            if (file.size > 1024 * 1024) {
+                toast.error('Maximum file size is 1MB');
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('file', file);
+            http.post('/file/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+                .then((res) => {
+                    setImageFile(res.data.filename);
+                })
+                .catch(function (error) {
+                    console.log(error.response);
+                });
+        }
+    };
 
     return (
         <Box>
@@ -146,6 +176,8 @@ function EditReward() {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <ToastContainer />
         </Box>
     );
 }

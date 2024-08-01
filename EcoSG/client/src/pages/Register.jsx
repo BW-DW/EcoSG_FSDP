@@ -19,8 +19,7 @@ function Register() {
             name: "",
             email: "",
             password: "",
-            confirmPassword: "",
-            dob: null  
+            confirmPassword: ""
         },
         validationSchema: yup.object({
             name: yup.string().trim()
