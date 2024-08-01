@@ -14,6 +14,11 @@ import Login from './pages/Login';
 import AccountSettings from './pages/AccountSettings'; // Import the AccountSettings component
 import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
 import UserTable from './pages/UserTable'; // Import the UserTable component
+import AddAnnouncement from './pages/AddAnnouncement'; // Import AddAnnouncement component
+import EditAnnouncement from './pages/EditAnnouncement'; // Import EditAnnouncement component
+import Announcements from './pages/Announcements'; // Import Announcements component
+import Homepage from './pages/Homepage';
+// import AnnouncementStaff from './pages/AnnouncementStaff'; // Import AnnouncementStaff component
 import http from './http';
 import UserContext from './contexts/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -67,6 +72,9 @@ function App() {
                 {user && user.role === 'staff' && (
                   <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
                 )}
+                {user && (
+                  <Link to="/Announcements" ><Typography>Announcements</Typography></Link>
+                )}
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -95,7 +103,7 @@ function App() {
 
           <Container>
             <Routes>
-              <Route path="/" element={<Tutorials />} />
+              <Route path="/" element={<Homepage />} />
               <Route path="/tutorials" element={<Tutorials />} />
               <Route path="/addtutorial" element={<AddTutorial />} />
               <Route path="/edittutorial/:id" element={<EditTutorial />} />
@@ -109,6 +117,10 @@ function App() {
                   <UserTable />
                 </ProtectedRoute>} 
               /> {/* Add the UserTable route and protected route */}
+              <Route path="/addannouncement" element={<AddAnnouncement />} />
+              <Route path="/editannouncement/:id" element={<EditAnnouncement />} />
+              <Route path="/Announcements" element={<Announcements />} />
+              {/* <Route path="/announcementsstaff" element={<AnnouncementStaff />} /> */}
             </Routes>
           </Container>
         </ThemeProvider>

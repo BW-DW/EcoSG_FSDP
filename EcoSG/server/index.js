@@ -20,6 +20,8 @@ const tutorialRoute = require('./routes/tutorial');
 app.use("/tutorial", tutorialRoute);
 const userRoute = require('./routes/user');
 app.use("/user", userRoute);
+const announcementRoute = require('./routes/announcement');
+app.use("/announcement", announcementRoute);
 
 const db = require('./models');
 db.sequelize.sync({ alter: true })
