@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATEONLY,
             allowNull: true
         },
+        donation: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+        },
         role: {
             type: DataTypes.STRING,
             defaultValue: 'customer',
