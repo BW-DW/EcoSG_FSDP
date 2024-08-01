@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, TextField, Button } from '@mui/material';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Box, Typography, TextField, Button, Switch} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormControlLabel,FormControl } from '@mui/material';
 import http from '../http';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -14,6 +14,7 @@ function EditReward() {
         title: "",
         description: "",
         points: "",
+        isEnabled: true,
     });
     const [loading, setLoading] = useState(true);
 
@@ -41,11 +42,13 @@ function EditReward() {
                 .min(1, 'Points must be at least 1')
                 .max(100, 'Points must be at most 100')
                 .required('Points is required'),
+            isEnabled: yup.boolean(),
         }),
         onSubmit: (data) => {
             data.title = data.title.trim();
             data.description = data.description.trim();
             data.points=data.points;
+            data.isEnabled = data.isEnabled;
             http.put(`/reward/${id}`, data)
                 .then((res) => {
                     console.log(res.data);
@@ -74,7 +77,7 @@ function EditReward() {
 
     return (
         <Box>
-            <Typography variant="h5" sx={{ my: 2 }}>
+            <Typography variant="h5" margin={2}>
                 Edit Reward
             </Typography>
             {
@@ -101,6 +104,7 @@ function EditReward() {
                             error={formik.touched.description && Boolean(formik.errors.description)}
                             helperText={formik.touched.description && formik.errors.description}
                         />
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <TextField
                             fullWidth margin="dense" autoComplete="off"
                             multiline maxRows={1}
@@ -113,6 +117,19 @@ function EditReward() {
                             helperText={formik.touched.points && formik.errors.points}
                             sx={{ width: 200 }}
                         />
+                        <FormControl sx={{ml: 2 }}>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                    checked={formik.values.isEnabled}
+                                    onChange={formik.handleChange}
+                                    name="isEnabled"
+                                    />
+                                }
+                                label="Enable for customers"
+                            />
+                        </FormControl>
+                        </Box>
                         <Box sx={{ mt: 2 }}>
                             <Button variant="contained" type="submit">
                                 Update
@@ -125,7 +142,6 @@ function EditReward() {
                     </Box>
                 )
             }
-
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>
                     Delete Reward

@@ -13,6 +13,7 @@ router.post("/", validateToken, async (req, res) => {
         title: yup.string().trim().min(3).max(100).required(),
         description: yup.string().trim().min(3).max(500).required(),
         points: yup.number().integer().min(1).max(100),
+        isEnabled: yup.boolean().default(false),
     });
     try {
         data = await validationSchema.validate(data,
@@ -81,6 +82,7 @@ router.put("/:id", validateToken, async (req, res) => {
         title: yup.string().trim().min(3).max(100),
         description: yup.string().trim().min(3).max(500),
         points: yup.number().integer().min(1).max(100),
+        isEnabled: yup.boolean(),
     });
     try {
         data = await validationSchema.validate(data,

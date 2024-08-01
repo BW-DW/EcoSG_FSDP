@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardContent, Input, IconButton, Button } from '@mui/material';
-import { AccountCircle, AccessTime, Search, Clear, Edit } from '@mui/icons-material';
+import { AccountCircle, AccessTime, Search, Clear, Edit, Margin } from '@mui/icons-material';
 import http from '../http';
 import dayjs from 'dayjs';
 import UserContext from '../contexts/UserContext';
@@ -117,6 +117,15 @@ function Rewards() {
                                         </Typography>
                                         <Typography sx={{ whiteSpace: 'pre-wrap' }}>
                                             <span>Points:</span> {reward.points}
+                                        </Typography>
+                                        <Typography sx={{ whiteSpace: 'pre-wrap', display: 'flex', alignItems: 'center' }}>
+                                            <span>Enabled Status: </span>
+                                            {reward.isEnabled ? 'Yes' : 'No'}
+                                            {reward.isEnabled ? (
+                                                <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'green', marginRight: 1, marginLeft: 1 }} />
+                                            ) : (
+                                                <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'red', marginRight: 1, marginLeft: 1 }} />
+                                            )}
                                         </Typography>
                                     </CardContent>
                                 </Card>
