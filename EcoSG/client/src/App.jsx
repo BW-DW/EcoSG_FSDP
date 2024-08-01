@@ -1,6 +1,7 @@
 import './App.css';
-import { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
+import { Container, AppBar, Toolbar, Typography, Box, Button, Menu, MenuItem } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import MyTheme from './themes/MyTheme';
@@ -31,6 +32,7 @@ import UserFacilities from './pages/UserFacilities';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
@@ -39,6 +41,23 @@ function App() {
       });
     }
   }, []);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleAccountSettings = () => {
+    window.location = "/account";
+  };
+
+  const handleDeleteAccount = () => {
+    window.location = "/AccountDeleted"
+  }
+
 
   const logout = () => {
     localStorage.clear();
@@ -68,8 +87,17 @@ function App() {
                 <Box sx={{ flexGrow: 1 }}></Box> 
                 {user && (
                   <>
-                    <Typography>{user.name}</Typography>
-                    <Button onClick={logout}>Logout</Button>
+                    <Typography onClick={handleMenuOpen} style={{ cursor: 'pointer' }}>
+                      {user.name}
+                    </Typography>
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={handleAccountSettings}>Account Settings</MenuItem>
+                      <MenuItem onClick={logout}>Logout</MenuItem>
+                    </Menu>
                   </>
                 )
                 }
