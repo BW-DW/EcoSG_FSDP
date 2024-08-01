@@ -131,6 +131,9 @@ function UserTable() {
                         <TableCell>Email</TableCell>
                         <TableCell>Date of Birth</TableCell>
                         <TableCell>Role</TableCell>
+                        <TableCell>Donations Made</TableCell>
+                        <TableCell>Created</TableCell>
+                        <TableCell>Last Updated</TableCell>
                         {/* <TableCell>Points</TableCell>
                         <TableCell>Hours</TableCell>
                         <TableCell>Total Events</TableCell>

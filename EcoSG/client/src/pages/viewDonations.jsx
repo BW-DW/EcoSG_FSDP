@@ -32,13 +32,13 @@ function Viewdon() {
     };
 
     const getTutorials = () => {
-        http.get(`/tutorial/userId/${user.id}`).then((res) => {
+        http.get(`/tutorial/userId/${user?.id}`).then((res) => {
             setTutorialList(res.data);
         });
     };
 
     const searchTutorials = () => {
-        http.get(`/tutorial/userId/${user.id}?search=${search}`).then((res) => {
+        http.get(`/tutorial/userId/${user?.id}?search=${search}`).then((res) => {
             setTutorialList(res.data);
         });
     };
@@ -148,7 +148,7 @@ function Viewdon() {
                                     Make a donation <Link to="/makeDonations">here</Link>
                                 </Typography>
                                 <Typography sx={{ color: 'white' }}>
-                                {user.id}
+                                {user?.id}
                                 </Typography>
         </Box>
     );
