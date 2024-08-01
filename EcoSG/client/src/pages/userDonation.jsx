@@ -25,6 +25,7 @@ import UserContext from '../contexts/UserContext';
 import EditDialog from '../components/EditDialog';
 
 function UserDonation() {
+    let tutorialAmounts={}
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [filter, setFilter] = useState('');
@@ -36,10 +37,31 @@ function UserDonation() {
     const [currentUser, setCurrentUser] = useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [tutorialList, setTutorialList] = useState([]);
 
-    function navigateToViewDonation(id) {
-        window.location.href = `./viewdonation/${id}`;
-    }
+    const getTutorials = () => {
+        http.get('/tutorial').then((res) => {
+            setTutorialList(res.data);
+        });
+    };
+
+    const calculateTutorialAmounts = () => {
+        let tutorialAmounts = {};
+      
+        users.forEach((user) => {
+          let userTutorials = tutorialList.filter((tutorial) => tutorial.userId === user.id);
+          let totalAmount = userTutorials.reduce((acc, tutorial) => acc + tutorial.amount, 0);
+          tutorialAmounts[user.id] = totalAmount;
+        });
+      
+        return tutorialAmounts;
+      };
+
+      useEffect(() => {
+        getTutorials();
+        tutorialAmounts=calculateTutorialAmounts();
+    }, []);
+    tutorialAmounts=calculateTutorialAmounts();
     // Function to fetch users based on search, filter, and order
     const fetchUsers = async () => {
         try {
@@ -201,7 +223,7 @@ function UserDonation() {
                             <TableCell>{user.role}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.dob}</TableCell>
-                            <TableCell>{user.donation !== null ? user.donation : '0'}</TableCell>
+                            <TableCell>{tutorialAmounts[user.id]}</TableCell>
                             <TableCell>
                                 <Link to={`/viewdonation/${user.id}`}>
                                     <Button variant="contained">

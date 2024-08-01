@@ -42,19 +42,19 @@ function Makedon() {
             amt = data.amount.trim()
             data.amount = parseInt(data.amount.trim());
             data.description = data.description.trim();
-            http.put(`user/${id}`, { donation: newAmount })
-                .then(response => {
-                    console.log(response.data);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-            // http.post("/tutorial", data)
-            //     .then((res) => {
-            //         console.log(res.data);
-            //         // // setUser({...user, donations: [...user.donations, data.amount] });
-            //         navigate(`/checkout/${amt}`);
+            // http.put(`user/${id}`, { donation: newAmount })
+            //     .then(response => {
+            //         console.log(response.data);
+            //     })
+            //     .catch(error => {
+            //         console.error(error);
             //     });
+            http.post("/tutorial", data)
+                .then((res) => {
+                    console.log(res.data);
+                    // // setUser({...user, donations: [...user.donations, data.amount] });
+                    navigate(`/checkout/${amt}`);
+                });
         }
         // onSubmit: (data) => {
         //     data.amount = parseInt(data.amount.trim());

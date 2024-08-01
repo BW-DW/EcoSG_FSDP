@@ -32,13 +32,13 @@ function Viewdon() {
     };
 
     const getTutorials = () => {
-        http.get('/tutorial').then((res) => {
+        http.get(`/tutorial/userId/${user.id}`).then((res) => {
             setTutorialList(res.data);
         });
     };
 
     const searchTutorials = () => {
-        http.get(`/tutorial?search=${search}`).then((res) => {
+        http.get(`/tutorial/userId/${user.id}?search=${search}`).then((res) => {
             setTutorialList(res.data);
         });
     };
@@ -93,16 +93,14 @@ function Viewdon() {
             </Box>
             <Grid container spacing={2}>
                 {
-                    tutorialList.map((tutorial, i) => {
+                    tutorialList.slice().reverse().map((tutorial, i) => {
                         return (
                             <Grid item xs={12} md={6} lg={4} key={tutorial.id}>
-                                <Typography sx={{ color: 'white' }}>
+                                {
+                                <Card>
+                                    <Typography sx={{ color: 'white' }}>
                                 {amt+=tutorial.amount}
                                 </Typography>
-                                
-                                {
-                                user && user.id === tutorial.userId && (
-                                <Card>
                                     <CardContent>
                                         <Box sx={{ display: 'flex', mb: 1 }}>
                                             <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -137,7 +135,7 @@ function Viewdon() {
                                         </Typography>
                                     </CardContent>
                                 </Card>
-                                )}
+                                }
                             </Grid>
                         );
                     })
