@@ -16,8 +16,8 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-const tutorialRoute = require('./routes/tutorial');
-app.use("/tutorial", tutorialRoute);
+const rewardRoute = require('./routes/reward');
+app.use("/reward", rewardRoute);
 const userRoute = require('./routes/user');
 app.use("/user", userRoute);
 const announcementRoute = require('./routes/announcement');

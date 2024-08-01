@@ -6,25 +6,26 @@ import http from '../http';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-function EditTutorial() {
+function EditReward() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [tutorial, setTutorial] = useState({
+    const [reward, setReward] = useState({
         title: "",
-        description: ""
+        description: "",
+        points: "",
     });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        http.get(`/tutorial/${id}`).then((res) => {
-            setTutorial(res.data);
+        http.get(`/reward/${id}`).then((res) => {
+            setReward(res.data);
             setLoading(false);
         });
     }, []);
 
     const formik = useFormik({
-        initialValues: tutorial,
+        initialValues: reward,
         enableReinitialize: true,
         validationSchema: yup.object({
             title: yup.string().trim()
@@ -34,15 +35,21 @@ function EditTutorial() {
             description: yup.string().trim()
                 .min(3, 'Description must be at least 3 characters')
                 .max(500, 'Description must be at most 500 characters')
-                .required('Description is required')
+                .required('Description is required'),
+            points: yup.number().integer()
+                .typeError('Points must be a number')
+                .min(1, 'Points must be at least 1')
+                .max(100, 'Points must be at most 100')
+                .required('Points is required'),
         }),
         onSubmit: (data) => {
             data.title = data.title.trim();
             data.description = data.description.trim();
-            http.put(`/tutorial/${id}`, data)
+            data.points=data.points;
+            http.put(`/reward/${id}`, data)
                 .then((res) => {
                     console.log(res.data);
-                    navigate("/tutorials");
+                    navigate("/rewards");
                 });
         }
     });
@@ -57,18 +64,18 @@ function EditTutorial() {
         setOpen(false);
     };
 
-    const deleteTutorial = () => {
-        http.delete(`/tutorial/${id}`)
+    const deleteReward = () => {
+        http.delete(`/reward/${id}`)
             .then((res) => {
                 console.log(res.data);
-                navigate("/tutorials");
+                navigate("/rewards");
             });
     }
 
     return (
         <Box>
             <Typography variant="h5" sx={{ my: 2 }}>
-                Edit Tutorial
+                Edit Reward
             </Typography>
             {
                 !loading && (
@@ -94,6 +101,18 @@ function EditTutorial() {
                             error={formik.touched.description && Boolean(formik.errors.description)}
                             helperText={formik.touched.description && formik.errors.description}
                         />
+                        <TextField
+                            fullWidth margin="dense" autoComplete="off"
+                            multiline maxRows={1}
+                            label="Points"
+                            name="points"
+                            value={formik.values.points}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.points && Boolean(formik.errors.points)}
+                            helperText={formik.touched.points && formik.errors.points}
+                            sx={{ width: 200 }}
+                        />
                         <Box sx={{ mt: 2 }}>
                             <Button variant="contained" type="submit">
                                 Update
@@ -109,11 +128,11 @@ function EditTutorial() {
 
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>
-                    Delete Tutorial
+                    Delete Reward
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Are you sure you want to delete this tutorial?
+                        Are you sure you want to delete this reward?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -122,7 +141,7 @@ function EditTutorial() {
                         Cancel
                     </Button>
                     <Button variant="contained" color="error"
-                        onClick={deleteTutorial}>
+                        onClick={deleteReward}>
                         Delete
                     </Button>
                 </DialogActions>
@@ -131,4 +150,4 @@ function EditTutorial() {
     );
 }
 
-export default EditTutorial;
+export default EditReward;
