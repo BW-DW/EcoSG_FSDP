@@ -23,6 +23,8 @@ import Viewdon from './pages/viewDonations';
 import Updatedon from './pages/updateDonations';
 import Checkout from './pages/checkout';
 import ReceiptPage from './pages/receipt';
+import UserDonation from './pages/userDonation';
+import Viewdonstaff from './pages/viewDonStaff';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -123,6 +125,7 @@ function App() {
               <Route path="/makedonations" element={<Makedon />} />
               <Route path="/makedonations/:id" element={<Makedon />} />
               <Route path="/viewdonations" element={<Viewdon />} />
+              <Route path="/viewdonation/:id" element={<Viewdonstaff />} />
               <Route path="/updatedonations/:id" element={<Updatedon />} />
               <Route path="/checkout/:id" element={<Checkout />} />
               <Route path="/receipt/:id" element={<ReceiptPage />} />
@@ -131,6 +134,11 @@ function App() {
                   <UserTable />
                 </ProtectedRoute>} 
               /> {/* Add the UserTable route and protected route */}
+              <Route path="/userdonations" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserDonation />
+                </ProtectedRoute>} 
+              />
             </Routes>
           </Container>
         </ThemeProvider>

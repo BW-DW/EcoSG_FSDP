@@ -7,12 +7,19 @@ import dayjs from 'dayjs';
 import UserContext from '../contexts/UserContext';
 import global from '../global';
 
-function Viewdon() {
+function Viewdonstaff() {
     let amt=0
     const [tutorialList, setTutorialList] = useState([]);
     const [search, setSearch] = useState('');
-    const { user } = useContext(UserContext);
+    const { id } = useParams();
 
+    const [user, setUser] = useState(null); // Initialize user state with null
+
+  useEffect(() => {
+    http.get(`/user/${id}`)
+      .then(response => response.json())
+      .then(data => setUser(data)); // Update user state with fetched data
+  }, [id]); // Run effect when id changes
 
     const onSearchChange = (e) => {
         setSearch(e.target.value);
@@ -140,4 +147,4 @@ function Viewdon() {
     );
 }
 
-export default Viewdon;
+export default Viewdonstaff;
