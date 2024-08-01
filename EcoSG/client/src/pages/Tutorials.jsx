@@ -18,7 +18,7 @@ function Tutorials() {
 
     const getTutorials = () => {
         http.get('/tutorial').then((res) => {
-            setTutorialList(res.data);
+            setTutorialList(res.data);  
         });
     };
 
@@ -68,7 +68,7 @@ function Tutorials() {
                 <Box sx={{ flexGrow: 1 }} />
                 {
                     user && (
-                        <Link to="/addtutorial" style={{ textDecoration: 'none' }}>
+                        <Link to="/addtutorial">
                             <Button variant='contained'>
                                 Add
                             </Button>
@@ -83,6 +83,15 @@ function Tutorials() {
                         return (
                             <Grid item xs={12} md={6} lg={4} key={tutorial.id}>
                                 <Card>
+                                    {
+                                        tutorial.imageFile && (
+                                            <Box className="aspect-ratio-container">
+                                                <img alt="tutorial"
+                                                    src={`${import.meta.env.VITE_FILE_BASE_URL}${tutorial.imageFile}`}>
+                                                </img>
+                                            </Box>
+                                        )
+                                    }
                                     <CardContent>
                                         <Box sx={{ display: 'flex', mb: 1 }}>
                                             <Typography variant="h6" sx={{ flexGrow: 1 }}>

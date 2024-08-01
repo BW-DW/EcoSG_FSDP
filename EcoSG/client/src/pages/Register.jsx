@@ -6,10 +6,6 @@ import * as yup from 'yup';
 import http from '../http';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';  // Import DesktopDatePicker
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';  // Import AdapterDateFns
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';  // Import LocalizationProvider
-
 
 function Register() {
     const navigate = useNavigate();
@@ -19,8 +15,7 @@ function Register() {
             name: "",
             email: "",
             password: "",
-            confirmPassword: "",
-            dob: null  
+            confirmPassword: ""
         },
         validationSchema: yup.object({
             name: yup.string().trim()
@@ -41,8 +36,7 @@ function Register() {
                     "Password at least 1 letter and 1 number"),
             confirmPassword: yup.string().trim()
                 .required('Confirm password is required')
-                .oneOf([yup.ref('password')], 'Passwords must match'),
-            dob: yup.date().nullable().required('Date of Birth is required')  
+                .oneOf([yup.ref('password')], 'Passwords must match')
         }),
         onSubmit: (data) => {
             data.name = data.name.trim();
@@ -60,75 +54,65 @@ function Register() {
     });
 
     return (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <Box sx={{
-                marginTop: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
-                <Typography variant="h5" sx={{ my: 2 }}>
+        <Box sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+        }}>
+            <Typography variant="h5" sx={{ my: 2 }}>
+                Register
+            </Typography>
+            <Box component="form" sx={{ maxWidth: '500px' }}
+                onSubmit={formik.handleSubmit}>
+                <TextField
+                    fullWidth margin="dense" autoComplete="off"
+                    label="Name"
+                    name="name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.name && Boolean(formik.errors.name)}
+                    helperText={formik.touched.name && formik.errors.name}
+                />
+                <TextField
+                    fullWidth margin="dense" autoComplete="off"
+                    label="Email"
+                    name="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.email && Boolean(formik.errors.email)}
+                    helperText={formik.touched.email && formik.errors.email}
+                />
+                <TextField
+                    fullWidth margin="dense" autoComplete="off"
+                    label="Password"
+                    name="password" type="password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.password && Boolean(formik.errors.password)}
+                    helperText={formik.touched.password && formik.errors.password}
+                />
+                <TextField
+                    fullWidth margin="dense" autoComplete="off"
+                    label="Confirm Password"
+                    name="confirmPassword" type="password"
+                    value={formik.values.confirmPassword}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                    helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                />
+                <Button fullWidth variant="contained" sx={{ mt: 2 }}
+                    type="submit">
                     Register
-                </Typography>
-                <Box component="form" sx={{ maxWidth: '500px' }}
-                    onSubmit={formik.handleSubmit}>
-                    <TextField
-                        fullWidth margin="dense" autoComplete="off"
-                        label="Name"
-                        name="name"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.name && Boolean(formik.errors.name)}
-                        helperText={formik.touched.name && formik.errors.name}
-                    />
-                    <TextField
-                        fullWidth margin="dense" autoComplete="off"
-                        label="Email"
-                        name="email"
-                        value={formik.values.email}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.email && Boolean(formik.errors.email)}
-                        helperText={formik.touched.email && formik.errors.email}
-                    />
-                    <TextField
-                        fullWidth margin="dense" autoComplete="off"
-                        label="Password"
-                        name="password" type="password"
-                        value={formik.values.password}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.password && Boolean(formik.errors.password)}
-                        helperText={formik.touched.password && formik.errors.password}
-                    />
-                    <TextField
-                        fullWidth margin="dense" autoComplete="off"
-                        label="Confirm Password"
-                        name="confirmPassword" type="password"
-                        value={formik.values.confirmPassword}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-                        helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                    />
-                    <DatePicker
-                        fullWidth
-                        label="Date of Birth"
-                        inputFormat="MM/dd/yyyy"
-                        value={formik.values.dob}
-                        onChange={(value) => formik.setFieldValue('dob', value)}
-                        renderInput={(params) => <TextField {...params} fullWidth margin="dense" />}
-                    />
-                    <Button width="20px" margin="auto" variant="contained" sx={{ mt: 2 }}
-                        type="submit">
-                        Register
-                    </Button>
-                </Box>
-
-                <ToastContainer />
+                </Button>
             </Box>
-        </LocalizationProvider>
+
+            <ToastContainer />
+        </Box>
     );
 }
 

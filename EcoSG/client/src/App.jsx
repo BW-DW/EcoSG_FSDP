@@ -1,7 +1,6 @@
 import './App.css';
-import React, { useState, useEffect } from 'react';
-// import { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Box, Button, Menu, MenuItem } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Container, AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import MyTheme from './themes/MyTheme';
@@ -11,14 +10,17 @@ import EditTutorial from './pages/EditTutorial';
 import MyForm from './pages/MyForm';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import AccountSettings from './pages/AccountSettings'; // Import the AccountSettings component
-import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
+import CreateFacilities from './pages/CreateFacilities';
+import EditFacilities from './pages/EditFacilities';
+import Facilities from "./pages/Facilities";
+import ContactUs from "./pages/ContactUs";
+import ContactMessages from "./pages/ContactMessages";
 import http from './http';
 import UserContext from './contexts/UserContext';
+import UserFacilities from './pages/UserFacilities';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
@@ -33,22 +35,6 @@ function App() {
     window.location = "/";
   };
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleAccountSettings = () => {
-    window.location = "/account";
-  };
-
-  const handleDeleteAccount = () => {
-    window.location = "/AccountDeleted"
-  }
-
   return (
     <UserContext.Provider value={{ user, setUser }}>
       <Router>
@@ -58,26 +44,23 @@ function App() {
               <Toolbar disableGutters={true}>
                 <Link to="/">
                   <Typography variant="h6" component="div">
-                    EcoSG
+                    Learning
                   </Typography>
                 </Link>
                 <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
-                <Box sx={{ flexGrow: 1 }}></Box>
+                <Link to="/createfacilities" ><Typography>Create Facilities</Typography></Link>
+                <Link to="/facilities" ><Typography>Facilities</Typography></Link>
+                <Link to="/contactus" ><Typography>Contact Us</Typography></Link>
+                <Link to="/contactmessages" ><Typography>Contact Messages</Typography></Link>
+                <Link to="/userfacilities" ><Typography>User Facilities</Typography></Link>
+                <Box sx={{ flexGrow: 1 }}></Box> 
                 {user && (
                   <>
-                    <Typography onClick={handleMenuOpen} style={{ cursor: 'pointer' }}>
-                      {user.name}
-                    </Typography>
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem onClick={handleAccountSettings}>Account Settings</MenuItem>
-                      <MenuItem onClick={logout}>Logout</MenuItem>
-                    </Menu>
+                    <Typography>{user.name}</Typography>
+                    <Button onClick={logout}>Logout</Button>
                   </>
-                )}
+                )
+                }
                 {!user && (
                   <>
                     <Link to="/register" ><Typography>Register</Typography></Link>
@@ -90,15 +73,20 @@ function App() {
 
           <Container>
             <Routes>
-              <Route path="/" element={<Tutorials />} />
-              <Route path="/tutorials" element={<Tutorials />} />
-              <Route path="/addtutorial" element={<AddTutorial />} />
-              <Route path="/edittutorial/:id" element={<EditTutorial />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/account" element={<AccountSettings />} /> {/* Add this route */}
-              <Route path="/accountdeleted" element={<AccountDeleted />} /> {/* Add this route */}
-              <Route path="/form" element={<MyForm />} />
+              <Route path={"/"} element={<Facilities />} />
+              <Route path={"/tutorials"} element={<Tutorials />} />
+              <Route path={"/addtutorial"} element={<AddTutorial />} />
+              <Route path={"/edittutorial/:id"} element={<EditTutorial />} />
+              <Route path={"/register"} element={<Register />} />
+              <Route path={"/login"} element={<Login />} />
+              <Route path={"/form"} element={<MyForm />} />
+              <Route path={"/createfacilities"} element={<CreateFacilities />} />
+              <Route path={"/editfacilities/:id"} element={<EditFacilities />} />
+              <Route path={"/facilities"} element={<Facilities />} />
+              <Route path={"/contactus"} element={<ContactUs />} />
+              {/* <Route path={"/contactMessages"} element={<ContactMessages />} /> */}
+              <Route path={"/contactmessages"} element={<ContactMessages/>}/>
+              <Route path={"/userfacilities"} element={<UserFacilities />} />
             </Routes>
           </Container>
         </ThemeProvider>

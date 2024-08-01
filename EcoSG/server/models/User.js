@@ -11,10 +11,6 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.STRING(100),
             allowNull: false
-        },
-        dob: {  // Add this field
-            type: DataTypes.DATEONLY,
-            allowNull: true
         }
     }, {
         tableName: 'users'

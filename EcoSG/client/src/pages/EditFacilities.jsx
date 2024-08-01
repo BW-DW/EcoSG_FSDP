@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, TextField, Button, Grid } from '@mui/material';
+import { Box, Typography, TextField, Button, Grid, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import http from '../http';
 import { useFormik } from 'formik';
@@ -8,48 +8,55 @@ import * as yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function EditTutorial() {
+const locations = ["Central", "North", "South", "East", "West"];
+const facilityTypes = ["Court", "Multi-purpose Hall", "Park"];
+
+function EditFacility() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [tutorial, setTutorial] = useState({
-        title: "",
-        description: ""
+    const [facility, setFacilty] = useState({
+        name: "",
+        description: "",
+        location: "",
+        facilityType: ""
     });
     const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        http.get(`/tutorial/${id}`).then((res) => {
-            setTutorial(res.data);
+        http.get(`/facilities/${id}`).then((res) => {
+            setFacilty(res.data);
             setImageFile(res.data.imageFile);
             setLoading(false);
         });
     }, []);
 
     const formik = useFormik({
-        initialValues: tutorial,
+        initialValues: facility,
         enableReinitialize: true,
         validationSchema: yup.object({
-            title: yup.string().trim()
-                .min(3, 'Title must be at least 3 characters')
-                .max(100, 'Title must be at most 100 characters')
-                .required('Title is required'),
+            name: yup.string().trim()
+                .min(3, 'Name must be at least 3 characters')
+                .max(100, 'Name must be at most 100 characters')
+                .required('Name is required'),
             description: yup.string().trim()
                 .min(3, 'Description must be at least 3 characters')
                 .max(500, 'Description must be at most 500 characters')
-                .required('Description is required')
+                .required('Description is required'),
+            location: yup.string().required('Location is required'),
+            facilityType: yup.string().required('Facility Type is required')
         }),
         onSubmit: (data) => {
             if (imageFile) {
                 data.imageFile = imageFile;
             }
-            data.title = data.title.trim();
+            data.name = data.name.trim();
             data.description = data.description.trim();
-            http.put(`/tutorial/${id}`, data)
+            http.put(`/facilities/${id}`, data)
                 .then((res) => {
                     console.log(res.data);
-                    navigate("/tutorials");
+                    navigate("/facilities");
                 });
         }
     });
@@ -64,11 +71,11 @@ function EditTutorial() {
         setOpen(false);
     };
 
-    const deleteTutorial = () => {
-        http.delete(`/tutorial/${id}`)
+    const deleteFacility = () => {
+        http.delete(`/facilities/${id}`)
             .then((res) => {
                 console.log(res.data);
-                navigate("/tutorials");
+                navigate("/facilities");
             });
     }
 
@@ -99,7 +106,7 @@ function EditTutorial() {
     return (
         <Box>
             <Typography variant="h5" sx={{ my: 2 }}>
-                Edit Tutorial
+                Edit Facility
             </Typography>
             {
                 !loading && (
@@ -108,13 +115,13 @@ function EditTutorial() {
                             <Grid item xs={12} md={6} lg={8}>
                                 <TextField
                                     fullWidth margin="dense" autoComplete="off"
-                                    label="Title"
-                                    name="title"
-                                    value={formik.values.title}
+                                    label="Name"
+                                    name="name"
+                                    value={formik.values.name}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    error={formik.touched.title && Boolean(formik.errors.title)}
-                                    helperText={formik.touched.title && formik.errors.title}
+                                    error={formik.touched.name && Boolean(formik.errors.name)}
+                                    helperText={formik.touched.name && formik.errors.name}
                                 />
                                 <TextField
                                     fullWidth margin="dense" autoComplete="off"
@@ -138,7 +145,7 @@ function EditTutorial() {
                                     {
                                         imageFile && (
                                             <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                                                <img alt="tutorial"
+                                                <img alt="facilties"
                                                     src={`${import.meta.env.VITE_FILE_BASE_URL}${imageFile}`}>
                                                 </img>
                                             </Box>
@@ -146,6 +153,40 @@ function EditTutorial() {
                                     }
                                 </Box>
                             </Grid>
+                            <FormControl fullWidth margin="dense">
+                                <InputLabel>Location</InputLabel>
+                                <Select
+                                    name="location"
+                                    value={formik.values.location}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.location && Boolean(formik.errors.location)}
+                                >
+                                    {locations.map((loc) => (
+                                        <MenuItem key={loc} value={loc}>{loc}</MenuItem>
+                                    ))}
+                                </Select>
+                                {formik.touched.location && formik.errors.location && (
+                                    <Typography color="error">{formik.errors.location}</Typography>
+                                )}
+                            </FormControl>
+                            <FormControl fullWidth margin="dense">
+                                <InputLabel>Facility Type</InputLabel>
+                                <Select
+                                    name="facilityType"
+                                    value={formik.values.facilityType}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.facilityType && Boolean(formik.errors.facilityType)}
+                                >
+                                    {facilityTypes.map((type) => (
+                                        <MenuItem key={type} value={type}>{type}</MenuItem>
+                                    ))}
+                                </Select>
+                                {formik.touched.facilityType && formik.errors.facilityType && (
+                                    <Typography color="error">{formik.errors.facilityType}</Typography>
+                                )}
+                            </FormControl>
                         </Grid>
                         <Box sx={{ mt: 2 }}>
                             <Button variant="contained" type="submit">
@@ -162,11 +203,11 @@ function EditTutorial() {
 
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>
-                    Delete Tutorial
+                    Delete Facility
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Are you sure you want to delete this tutorial?
+                        Are you sure you want to delete this facility?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -175,7 +216,7 @@ function EditTutorial() {
                         Cancel
                     </Button>
                     <Button variant="contained" color="error"
-                        onClick={deleteTutorial}>
+                        onClick={deleteFacility}>
                         Delete
                     </Button>
                 </DialogActions>
@@ -186,4 +227,4 @@ function EditTutorial() {
     );
 }
 
-export default EditTutorial;
+export default EditFacility;
