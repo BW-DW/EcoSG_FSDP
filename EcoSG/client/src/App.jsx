@@ -154,7 +154,7 @@ function App() {
                 )}
 
                 {user && user.role === 'customer' && (
-                  <Link to="/facilities"><Typography>Facilities</Typography></Link>
+                  <Link to="/userfacilities"><Typography>Facilities</Typography></Link>
                 )}
 
                 {user && user.role === 'customer' && (
