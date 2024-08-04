@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        isEnabled: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        }
     }, {
         tableName: 'rewards'
     });
