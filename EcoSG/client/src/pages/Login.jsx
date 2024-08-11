@@ -35,7 +35,6 @@ function Login() {
             password: yup.string().trim()
                 .max(50, 'Password must be at most 50 characters')
                 .required('Password is required')
-
         }),
         onSubmit: (data) => {
             setIsLoading(true);
@@ -108,6 +107,14 @@ function Login() {
                     {isLoading ? 'Loading...' : 'Login'}
                 </Button>
             </Box>
+
+            <Button
+                variant="text"
+                sx={{ mt: 2 }}
+                onClick={() => navigate("/forgotpassword")}
+            >
+                Forgot Password?
+            </Button>
 
             <ToastContainer />
         </Box>

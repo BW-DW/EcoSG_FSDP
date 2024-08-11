@@ -17,7 +17,7 @@ function AccountSettings() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [fieldToEdit, setFieldToEdit] = useState('');
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-    
+
     const navigate = useNavigate();
 
     const fetchUserData = async () => {
@@ -32,12 +32,12 @@ function AccountSettings() {
     useEffect(() => {
         if (user) {
             fetchUserData();
-        //     http.get(`/user/${user.id}/events`).then((res) => {
-        //         setEventsHistory(res.data);
-        //     });
-        //     http.get(`/user/${user.id}/purchases`).then((res) => {
-        //         setPurchaseHistory(res.data);
-        //     });
+            //     http.get(`/user/${user.id}/events`).then((res) => {
+            //         setEventsHistory(res.data);
+            //     });
+            //     http.get(`/user/${user.id}/purchases`).then((res) => {
+            //         setPurchaseHistory(res.data);
+            //     });
         }
     }, [user]);
 
@@ -52,7 +52,11 @@ function AccountSettings() {
     };
 
     const handleSave = async (newValue, currentPassword) => {
-        const updatedUser = { ...user, [fieldToEdit]: newValue };
+        const updatedUser = { 
+            ...user, 
+            [fieldToEdit]: newValue,
+            verified: fieldToEdit === 'email' ? false : user.verified
+        };
         setUser(updatedUser);
 
         const updateData = {
@@ -61,15 +65,16 @@ function AccountSettings() {
             dob: updatedUser.dob,
             password: fieldToEdit === 'password' ? newValue : undefined,
             currentPassword: fieldToEdit === 'password' ? currentPassword : undefined, // Include current password only if updating password
+            verified: updatedUser.verified // Include the updated verified status
         };
 
         try {
             await http.put(`/user/${user.id}`, updateData);
             toast.success(`${fieldToEdit} updated successfully`);
             fetchUserData();
-          } catch (err) {
+        } catch (err) {
             throw new Error(err.response.data.message || 'Error updating field');
-          }
+        }
     };
 
     const DeleteAccount = () => {
@@ -135,11 +140,22 @@ function AccountSettings() {
                         </Grid>
                     </Box> */}
                     <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle1" sx={{textAlign: 'center'}}>Personal Details</Typography>
+                        <Typography variant="subtitle1" sx={{ textAlign: 'center' }}>Personal Details</Typography>
                         <Box sx={{ p: 1, backgroundColor: '#f1f8e9', borderRadius: 1 }}>
                             <Typography>Username: {user?.name} <Button onClick={() => handleDialogOpen('name')}>Edit</Button></Typography>
                             <Typography>Password: <Button onClick={() => handleDialogOpen('password')}>Change Password</Button></Typography>
-                            <Typography>Email: {user?.email} <Button onClick={() => handleDialogOpen('email')}>Change Email</Button></Typography>
+                            <Typography>Email: {user?.email} <Button onClick={() => handleDialogOpen('email')}>Change Email</Button>
+                                {!user?.verified && (
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        sx={{ ml: 2 }}
+                                        onClick={() => navigate('/verify-email')}
+                                    >
+                                        Verify your email now
+                                    </Button>
+                                )}
+                            </Typography>
                             <Typography>Date of Birth: {dayjs(user?.dob).format('DD/MM/YYYY')} <Button onClick={() => handleDialogOpen('dob')}>Edit</Button></Typography>
                         </Box>
                     </Box>

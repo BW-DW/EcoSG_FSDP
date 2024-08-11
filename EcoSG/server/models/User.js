@@ -30,7 +30,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
             allowNull: false,
-        }
+        },
+        verificationCode: {
+            type: DataTypes.STRING,
+            defaultValue: '',
+            allowNull: true
+        },
     }, {
         tableName: 'users'
     });

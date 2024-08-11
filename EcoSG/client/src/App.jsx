@@ -42,7 +42,8 @@ import Checkout from './pages/checkout';
 import ReceiptPage from './pages/receipt';
 import UserDonation from './pages/userDonation';
 import Viewdonstaff from './pages/viewDonStaff';
-import EmailAuth from './components/EmailAuth';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/forgotPassword';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -296,7 +297,9 @@ function App() {
               <Route path="/createevent" element={<CreateEvent />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/forgotpassword" element={<ForgotPassword />} />
               <Route path="/account" element={<AccountSettings />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/accountdeleted" element={<AccountDeleted />} />
               <Route path="/form" element={<MyForm />} />
               <Route path="/donations" element={<Donations />} />
