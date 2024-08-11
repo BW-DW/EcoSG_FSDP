@@ -13,30 +13,17 @@ function Viewdon() {
     const [search, setSearch] = useState('');
     const { user } = useContext(UserContext);
 
-    const updateDonation = async (userId, donationAmount) => {
-        try {
-          const response = await http.put(`/user/${userId}`, {
-            name: user.name,
-            donation: donationAmount
-          });
-          console.log(response.data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-    
-
 
     const onSearchChange = (e) => {
         setSearch(e.target.value);
     };
     const getTutorials = () => {
-        http.get(`/tutorial/userId/${user?.id}`).then((res) => {
+        http.get(`/tutorial`).then((res) => {
             setTutorialList(res.data);
         });
     };
     const searchTutorials = () => {
-        http.get(`/tutorial/userId/${user?.id}?search=${search}`).then((res) => {
+        http.get(`/tutorial?search=${search}`).then((res) => {
             setTutorialList(res.data);
         });
     };
@@ -85,7 +72,7 @@ function Viewdon() {
             </Box>
             <Grid container spacing={2}>
                 {
-                    tutorialList.slice().reverse().map((tutorial, i) => {
+                    tutorialList.map((tutorial, i) => {
                         return (
                             
                                 user && user.id === tutorial.userId && (
@@ -102,13 +89,12 @@ function Viewdon() {
                                                 {tutorial.amount}
                                             </Typography>
                                             {
-                                                user && user.id === tutorial.userId && (
                                                     <Link to={`/updatedonations/${tutorial.id}`}>
                                                         <IconButton color="primary" sx={{ padding: '4px' }}>
                                                             <Edit />
                                                         </IconButton>
                                                     </Link>
-                                                )
+                                                
                                             }
                                         </Box>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}
