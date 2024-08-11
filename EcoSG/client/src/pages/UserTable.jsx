@@ -131,6 +131,9 @@ function UserTable() {
                         <TableCell>Email</TableCell>
                         <TableCell>Date of Birth</TableCell>
                         <TableCell>Role</TableCell>
+                        <TableCell>Donations Made</TableCell>
+                        <TableCell>Created</TableCell>
+                        <TableCell>Last Updated</TableCell>
                         {/* <TableCell>Points</TableCell>
                         <TableCell>Hours</TableCell>
                         <TableCell>Total Events</TableCell>
@@ -151,6 +154,9 @@ function UserTable() {
                             <TableCell>{user.hours}</TableCell>
                             <TableCell>{user.totalEvents}</TableCell>
                             <TableCell>{user.donate}</TableCell> */}
+                            <TableCell>{user.donation !== null ? user.donation : 'Null'}</TableCell>
+                            <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+                            <TableCell>{new Date(user.updatedAt).toLocaleString()}</TableCell>
                             <TableCell>
                                 <IconButton onClick={() => navigate(`/users/edit/${user.id}`)}>
                                     <Edit />

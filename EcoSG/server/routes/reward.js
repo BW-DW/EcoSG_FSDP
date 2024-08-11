@@ -63,6 +63,21 @@ router.get("/:id", async (req, res) => {
     res.json(reward);
 });
 
+router.get("/userId/:userId", async (req, res) => {
+    let id = req.params.userId;
+    let tutorial = await Tutorial.findAll({
+        where: { userId: id },
+    }, {
+        include: { model: User, as: "user", attributes: ['name'] }
+    });
+    // Check id not found
+    if (!tutorial) {
+        res.sendStatus(404);
+        return;
+    }
+    res.json(tutorial);
+});
+
 router.put("/:id", validateToken, async (req, res) => {
     let id = req.params.id;
     // Check id not found

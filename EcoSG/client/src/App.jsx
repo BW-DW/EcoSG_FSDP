@@ -1,6 +1,5 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
-// import { useState, useEffect } from 'react';
 import { Container, AppBar, Toolbar, Typography, Box, Button, Menu, MenuItem } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
@@ -8,18 +7,24 @@ import MyTheme from './themes/MyTheme';
 import Rewards from './pages/Rewards';
 import AddReward from './pages/AddReward';
 import EditReward from './pages/EditReward';
+import CreateEvent from './pages/CreateEvent';
 import MyForm from './pages/MyForm';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import AccountSettings from './pages/AccountSettings'; // Import the AccountSettings component
-import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
-import UserTable from './pages/UserTable'; // Import the UserTable component
-import UserTableEdit from './pages/UserTableEdit'; // Import UserTableEdit component
-import AddAnnouncement from './pages/AddAnnouncement'; // Import AddAnnouncement component
-import EditAnnouncement from './pages/EditAnnouncement'; // Import EditAnnouncement component
-import Announcements from './pages/Announcements'; // Import Announcements component
+import AccountSettings from './pages/AccountSettings';
+import AccountDeleted from './pages/AccountDeleted';
+import UserTable from './pages/UserTable';
+import UserTableEdit from './pages/UserTableEdit';
+import AddAnnouncement from './pages/AddAnnouncement';
+import EditAnnouncement from './pages/EditAnnouncement';
+import Announcements from './pages/Announcements';
 import Homepage from './pages/Homepage';
-// import AnnouncementStaff from './pages/AnnouncementStaff'; // Import AnnouncementStaff component
+import Events from './pages/Events';
+import EditEvent from './pages/EditEvent';
+import EventDetails from './pages/EventDetails';
+import AdminEvents from './pages/AdminEvents';
+import AdminEventDetails from './pages/AdminEventDetails';
+import CompletedEvents from './pages/CompletedEvents';
 import http from './http';
 import UserContext from './contexts/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -42,9 +47,10 @@ import Viewdonstaff from './pages/viewDonStaff';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [facilityAnchorEl, setFacilityAnchorEl] = useState(null); // For facility dropdown
-  const [donationAnchorEl, setDonationAnchorEl] = useState(null); // For donation dropdown
+  const [anchorElEvents, setAnchorElEvents] = useState(null);
+  const [anchorElAccount, setAnchorElAccount] = useState(null);
+  const [facilityAnchorEl, setFacilityAnchorEl] = useState(null);
+  const [donationAnchorEl, setDonationAnchorEl] = useState(null);
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
@@ -54,12 +60,20 @@ function App() {
     }
   }, []);
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+  const handleEventsMenuOpen = (event) => {
+    setAnchorElEvents(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleEventsMenuClose = () => {
+    setAnchorElEvents(null);
+  };
+
+  const handleAccountMenuOpen = (event) => {
+    setAnchorElAccount(event.currentTarget);
+  };
+
+  const handleAccountMenuClose = () => {
+    setAnchorElAccount(null);
   };
 
   const handleFacilityMenuOpen = (event) => {
@@ -83,9 +97,8 @@ function App() {
   };
 
   const handleDeleteAccount = () => {
-    window.location = "/AccountDeleted"
-  }
-
+    window.location = "/AccountDeleted";
+  };
 
   const logout = () => {
     localStorage.clear();
@@ -100,14 +113,13 @@ function App() {
             <Container>
               <Toolbar disableGutters={true}>
                 <Link to="/"><Typography variant="h6" component="div">EcoSG</Typography></Link>
-                <Link to="/rewards" ><Typography>Rewards</Typography></Link>
-                <Link to="/announcements" ><Typography>Announcements</Typography></Link>
+                <Link to="/rewards"><Typography>Rewards</Typography></Link>
+                <Link to="/announcements"><Typography>Announcements</Typography></Link>
                 {user && user.role === 'staff' && (
                   <Link to="/users" style={{ textDecoration: 'none' }}><Typography>Users</Typography></Link>
                 )}
-                
 
-                  {/* Facility Dropdown for staff*/ }
+                {/* Facility Dropdown for staff */}
                 {user && user.role === 'staff' && (
                   <>
                     <Typography
@@ -144,24 +156,22 @@ function App() {
                 )}
 
                 {user && user.role === 'customer' && (
-                  <Link to="/facilities" ><Typography>Facilities</Typography></Link>
+                  <Link to="/userfacilities"><Typography>Facilities</Typography></Link>
                 )}
 
                 {user && user.role === 'customer' && (
-                  <Link to="/contactus" ><Typography>Contact Us</Typography></Link>
+                  <Link to="/contactus"><Typography>Contact Us</Typography></Link>
                 )}
                 {user && user.role === 'staff' && (
-                  <Link to="/contactmessages" ><Typography>Contact Messages</Typography></Link>
+                  <Link to="/contactmessages"><Typography>Contact Messages</Typography></Link>
                 )}
-
-                {/* <Link to="/userfacilities" ><Typography>User Facilities</Typography></Link> */}
 
                 {user && user.role === 'staff' && (
                   <Link to="/userdonations" style={{ textDecoration: 'none' }}><Typography>Users' Donations</Typography></Link>
                 )}
 
                 {/* Donations Dropdown */}
-                {user && user.role === 'customer' &&(
+                {user && user.role === 'customer' && (
                   <>
                     <Typography
                       onClick={handleDonationMenuOpen}
@@ -208,28 +218,69 @@ function App() {
                   </>
                 )}
 
+                <Typography
+                  aria-controls={Boolean(anchorElEvents) ? 'events-menu' : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={Boolean(anchorElEvents) ? 'true' : undefined}
+                  onClick={handleEventsMenuOpen}
+                  sx={{ cursor: 'pointer', mr: 2 }}
+                >
+                  Events
+                </Typography>
+                <Menu
+                  id="events-menu"
+                  anchorEl={anchorElEvents}
+                  open={Boolean(anchorElEvents)}
+                  onClose={handleEventsMenuClose}
+                  MenuListProps={{
+                    'aria-labelledby': 'events-button',
+                  }}
+                >
+                  <MenuItem onClick={handleEventsMenuClose}>
+                    <Link to="/events" style={{ textDecoration: 'none', color: 'inherit' }}>
+                      View Events
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleEventsMenuClose}>
+                    <Link to="/createevent" style={{ textDecoration: 'none', color: 'inherit' }}>
+                      Create Event
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleEventsMenuClose}>
+                    <Link to="/completedevents" style={{ textDecoration: 'none', color: 'inherit' }}>
+                      Completed Events
+                    </Link>
+                  </MenuItem>
+                  {user && (
+                    <MenuItem onClick={handleEventsMenuClose}>
+                      <Link to="/admin/events" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        Admin Events
+                      </Link>
+                    </MenuItem>
+                  )}
+                </Menu>
+
                 <Box sx={{ flexGrow: 1 }}></Box>
 
                 {user && (
                   <>
-                    <Typography onClick={handleMenuOpen} style={{ cursor: 'pointer' }}>
+                    <Typography onClick={handleAccountMenuOpen} style={{ cursor: 'pointer' }}>
                       {user.name}
                     </Typography>
                     <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={handleMenuClose}
+                      anchorEl={anchorElAccount}
+                      open={Boolean(anchorElAccount)}
+                      onClose={handleAccountMenuClose}
                     >
                       <MenuItem onClick={handleAccountSettings}>Account Settings</MenuItem>
                       <MenuItem onClick={logout}>Logout</MenuItem>
                     </Menu>
                   </>
-                )
-                }
+                )}
                 {!user && (
                   <>
-                    <Link to="/register" ><Typography>Register</Typography></Link>
-                    <Link to="/login" ><Typography>Login</Typography></Link>
+                    <Link to="/register"><Typography>Register</Typography></Link>
+                    <Link to="/login"><Typography>Login</Typography></Link>
                   </>
                 )}
               </Toolbar>
@@ -242,6 +293,8 @@ function App() {
               <Route path="/rewards" element={<Rewards />} />
               <Route path="/addreward" element={<AddReward />} />
               <Route path="/editreward/:id" element={<EditReward />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/createevent" element={<CreateEvent />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/account" element={<AccountSettings />} />
@@ -261,27 +314,30 @@ function App() {
                 <ProtectedRoute requiredRole="staff">
                   <UserTable />
                 </ProtectedRoute>}
-              /> {/* Add the UserTable route and protected route */}
+              />
               <Route path="/users/edit/:id" element={
                 <ProtectedRoute requiredRole="staff">
                   <UserTableEdit />
-                </ProtectedRoute>} /> {/* Add the UserTableEdit route */}
+                </ProtectedRoute>} />
               <Route path="/addannouncement" element={<AddAnnouncement />} />
               <Route path="/editannouncement/:id" element={<EditAnnouncement />} />
               <Route path="/announcements" element={<Announcements />} />
-              {/* <Route path="/announcementsstaff" element={<AnnouncementStaff />} /> */}
-              <Route path={"/createfacilities"} element={<CreateFacilities />} />
-              <Route path={"/editfacilities/:id"} element={<EditFacilities />} />
-              <Route path={"/facilities"} element={<Facilities />} />
-              <Route path={"/contactus"} element={<ContactUs />} />
-              {/* <Route path={"/contactMessages"} element={<ContactMessages />} /> */}
-              <Route path={"/contactmessages"} element={<ContactMessages />} />
-              <Route path={"/userfacilities"} element={<UserFacilities />} />
+              <Route path="/createfacilities" element={<CreateFacilities />} />
+              <Route path="/editfacilities/:id" element={<EditFacilities />} />
+              <Route path="/facilities" element={<Facilities />} />
+              <Route path="/contactus" element={<ContactUs />} />
+              <Route path="/contactmessages" element={<ContactMessages />} />
+              <Route path="/userfacilities" element={<UserFacilities />} />
               <Route path="/userdonations" element={
                 <ProtectedRoute requiredRole="staff">
                   <UserDonation />
                 </ProtectedRoute>}
               />
+              <Route path="/event/:id" element={<EventDetails />} />
+              <Route path="/editevent/:id" element={<EditEvent />} />
+              <Route path="/admin/events" element={<AdminEvents />} />
+              <Route path="/admin/event/:id" element={<AdminEventDetails />} />
+              <Route path="/completedevents" element={<CompletedEvents />} />
             </Routes>
           </Container>
         </ThemeProvider>

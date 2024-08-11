@@ -13,17 +13,30 @@ function Viewdon() {
     const [search, setSearch] = useState('');
     const { user } = useContext(UserContext);
 
+    const updateDonation = async (userId, donationAmount) => {
+        try {
+          const response = await http.put(`/user/${userId}`, {
+            name: user.name,
+            donation: donationAmount
+          });
+          console.log(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+    
+
 
     const onSearchChange = (e) => {
         setSearch(e.target.value);
     };
     const getTutorials = () => {
-        http.get('/tutorial').then((res) => {
+        http.get(`/tutorial/userId/${user?.id}`).then((res) => {
             setTutorialList(res.data);
         });
     };
     const searchTutorials = () => {
-        http.get(`/tutorial?search=${search}`).then((res) => {
+        http.get(`/tutorial/userId/${user?.id}?search=${search}`).then((res) => {
             setTutorialList(res.data);
         });
     };
@@ -72,7 +85,7 @@ function Viewdon() {
             </Box>
             <Grid container spacing={2}>
                 {
-                    tutorialList.map((tutorial, i) => {
+                    tutorialList.slice().reverse().map((tutorial, i) => {
                         return (
                             
                                 user && user.id === tutorial.userId && (
@@ -128,6 +141,9 @@ function Viewdon() {
                                 </Typography>
                                 <Typography variant="h5" sx={{ my: 2 }}>
                                     Make a donation <Link to="/makeDonations">here</Link>
+                                </Typography>
+                                <Typography sx={{ color: 'white' }}>
+                                {user?.id}
                                 </Typography>
         </Box>
     );

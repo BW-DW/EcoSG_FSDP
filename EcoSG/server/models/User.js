@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATEONLY,
             allowNull: true
         },
+        donation: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+        },
         role: {
             type: DataTypes.STRING,
             defaultValue: 'customer',
@@ -27,8 +32,17 @@ module.exports = (sequelize, DataTypes) => {
 
     User.associate = (models) => {
         User.hasMany(models.Reward, {
+                foreignKey: "userId",
+                onDelete: "cascade"
+        });
+        User.hasMany(models.Event, {
             foreignKey: "userId",
             onDelete: "cascade"
+        });
+        User.belongsToMany(models.Event, {
+            through: 'EventParticipant',
+            as: 'events',
+            foreignKey: 'userId'
         });
     };
 

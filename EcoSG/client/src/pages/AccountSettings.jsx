@@ -104,7 +104,7 @@ function AccountSettings() {
                     <Typography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                         Hello, {user?.name}!
                     </Typography>
-                    <Box sx={{ mb: 2, alignItems: 'center', textAlign: 'center'}}>
+                    {/* <Box sx={{ mb: 2, alignItems: 'center', textAlign: 'center'}}>
                         <Typography variant="subtitle1">Events History</Typography>
                         <Grid container spacing={1}>
                             {eventsHistory.map((event) => (
@@ -133,7 +133,7 @@ function AccountSettings() {
                                 </Grid>
                             ))}
                         </Grid>
-                    </Box>
+                    </Box> */}
                     <Box sx={{ mb: 2 }}>
                         <Typography variant="subtitle1" sx={{textAlign: 'center'}}>Personal Details</Typography>
                         <Box sx={{ p: 1, backgroundColor: '#f1f8e9', borderRadius: 1 }}>
