@@ -26,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 'customer',
             allowNull: false,
         },
+        verified: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: false,
+        }
     }, {
         tableName: 'users'
     });

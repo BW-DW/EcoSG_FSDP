@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios'); 
 const cors = require('cors');
 require('dotenv').config();
 
@@ -14,7 +15,25 @@ app.use(cors({
 
 // Simple Route
 app.get("/", (req, res) => {
-    res.send("Welcome to the learning space.");
+    res.send("Welcome to EcoSG");
+});
+
+// data-sitekey="6LfbKSQqAAAAAFXdxb9hN5dQYW_XkmmflREUQc_p"
+// reCAPTCHA Verification Middleware
+const verifyRecaptcha = async (token) => {
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`;
+
+    const response = await axios.post(url);
+    return response.data.success;
+};
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(err.status || 500).json({
+        message: Array.isArray(err.message) ? err.message : [err.message],
+    });
 });
 
 // Routes
@@ -78,5 +97,32 @@ db.sequelize.sync({ alter: true })
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
+    });
+
+    // Routes
+    app.post("/user/login", async (req, res) => {
+        const { email, password, recaptchaToken, incorrectAttempts } = req.body;
+
+        if (incorrectAttempts > 0) {
+            const recaptchaVerified = await verifyRecaptcha(recaptchaToken);
+            if (!recaptchaVerified) {
+                return res.status(400).json({ message: "reCAPTCHA verification failed" });
+            }
+        }
+
+        // Proceed with your login logic here...
+        res.json({ accessToken: "dummy_token", user: { name: "User", role: "customer" } });
+    });
+
+    app.post("/user/register", async (req, res) => {
+        const { name, email, password, confirmPassword, dob, recaptchaToken } = req.body;
+
+        const recaptchaVerified = await verifyRecaptcha(recaptchaToken);
+        if (!recaptchaVerified) {
+            return res.status(400).json({ message: "reCAPTCHA verification failed" });
+        }
+
+        // Proceed with your registration logic here...
+        res.json({ message: "Registration successful!" });
     });
     

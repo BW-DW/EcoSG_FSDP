@@ -42,6 +42,7 @@ import Checkout from './pages/checkout';
 import ReceiptPage from './pages/receipt';
 import UserDonation from './pages/userDonation';
 import Viewdonstaff from './pages/viewDonStaff';
+import EmailAuth from './components/EmailAuth';
 
 function App() {
   const [user, setUser] = useState(null);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -9,17 +9,28 @@ import 'react-toastify/dist/ReactToastify.css';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';  // Import DesktopDatePicker
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';  // Import LocalizationProvider
-
+import ReCAPTCHA from "react-google-recaptcha"; // Import reCAPTCHA
 
 function Register() {
     const navigate = useNavigate();
+    const [isCaptchaComplete, setIsCaptchaComplete] = useState(false);
+
+    const handleRecaptchaChange = (value) => {
+        if (value) {
+          setIsCaptchaComplete(true);
+        } else {
+          setIsCaptchaComplete(false);
+        }
+      };
+      
 
     const formik = useFormik({
         initialValues: {
             name: "",
             email: "",
             password: "",
-            confirmPassword: ""
+            confirmPassword: "",
+            dob: null
         },
         validationSchema: yup.object({
             name: yup.string().trim()
@@ -48,15 +59,20 @@ function Register() {
                 .typeError('Invalid Date of Birth')
         }),
         onSubmit: (data) => {
+            data.recaptchaToken = "6LfbKSQqAAAAAFXdxb9hN5dQYW_XkmmflREUQc_p";
             data.name = data.name.trim();
             data.email = data.email.trim().toLowerCase();
             data.password = data.password.trim();
             http.post("/user/register", data)
                 .then((res) => {
                     console.log(res.data);
+                    toast.success('Registration successful!')
                     navigate("/login");
                 })
                 .catch(function (err) {
+                    const errorMessage = Array.isArray(err.response?.data?.errors)
+                    ? err.response.data.errors.join(', ')
+                    : err.response?.data?.message || 'An error occurred during registration.';
                     toast.error(`${err.response.data.message}`);
                 });
         }
@@ -64,86 +80,94 @@ function Register() {
 
     return (
 
-            <Box sx={{
-                marginTop: 5,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
-                <Typography variant="h5" sx={{ my: 2 }}>
-                    Register
-                </Typography>
-                <Box component="form" sx={{ maxWidth: '400px', width: '100%' }}
-                    onSubmit={formik.handleSubmit}>
-                    <TextField
-                        fullWidth margin="dense" autoComplete="off"
-                        label="Name"
-                        name="name"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.name && Boolean(formik.errors.name)}
-                        helperText={formik.touched.name && formik.errors.name}
-                    />
-                    <TextField
-                        fullWidth margin="dense" autoComplete="off"
-                        label="Email"
-                        name="email"
-                        value={formik.values.email}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.email && Boolean(formik.errors.email)}
-                        helperText={formik.touched.email && formik.errors.email}
-                    />
-                    <TextField
-                        fullWidth margin="dense" autoComplete="off"
-                        label="Password"
-                        name="password" type="password"
-                        value={formik.values.password}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.password && Boolean(formik.errors.password)}
-                        helperText={formik.touched.password && formik.errors.password}
-                    />
-                    <TextField
-                        fullWidth margin="dense" autoComplete="off"
-                        label="Confirm Password"
-                        name="confirmPassword" type="password"
-                        value={formik.values.confirmPassword}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-                        helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                    />
-                    <Box sx={{ display:'flex', justifyContent:'center', width: '100%', mt: 1}}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker 
-                                disableFuture
-                                format="DD/MM/YYYY"
-                                label="Date Of Birth"
-                                name="dob"
-                                value={formik.values.dob}
-                                onChange={(dob) => formik.setFieldValue('dob', dob)}
-                                onBlur={() => formik.setFieldTouched('dob', true)}
-                                error={formik.touched.dob && Boolean(formik.errors.dob)}
-                                slotProps={{
-                                    textField: {
-                                        error: formik.touched.dob && Boolean(formik.errors.dob),
-                                        helperText: formik.touched.dob && formik.errors.dob
-                                    }
-                                }}
-                            />
-                        </LocalizationProvider>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                        <Button variant="contained" type="submit">
-                            Register
-                        </Button>
-                    </Box>
+        <Box sx={{
+            marginTop: 5,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+        }}>
+            <Typography variant="h5" sx={{ my: 2 }}>
+                Register
+            </Typography>
+            <Box component="form" sx={{ maxWidth: '400px', width: '100%' }}
+                onSubmit={formik.handleSubmit}>
+                <TextField
+                    fullWidth margin="dense" autoComplete="off"
+                    label="Name"
+                    name="name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.name && Boolean(formik.errors.name)}
+                    helperText={formik.touched.name && formik.errors.name}
+                />
+                <TextField
+                    fullWidth margin="dense" autoComplete="off"
+                    label="Email"
+                    name="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.email && Boolean(formik.errors.email)}
+                    helperText={formik.touched.email && formik.errors.email}
+                />
+                <TextField
+                    fullWidth margin="dense" autoComplete="off"
+                    label="Password"
+                    name="password" type="password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.password && Boolean(formik.errors.password)}
+                    helperText={formik.touched.password && formik.errors.password}
+                />
+                <TextField
+                    fullWidth margin="dense" autoComplete="off"
+                    label="Confirm Password"
+                    name="confirmPassword" type="password"
+                    value={formik.values.confirmPassword}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                    helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                />
+                <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 1 }}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            disableFuture
+                            format="DD/MM/YYYY"
+                            label="Date Of Birth"
+                            name="dob"
+                            value={formik.values.dob}
+                            onChange={(dob) => formik.setFieldValue('dob', dob)}
+                            onBlur={() => formik.setFieldTouched('dob', true)}
+                            error={formik.touched.dob && Boolean(formik.errors.dob)}
+                            slotProps={{
+                                textField: {
+                                    error: formik.touched.dob && Boolean(formik.errors.dob),
+                                    helperText: formik.touched.dob && formik.errors.dob
+                                }
+                            }}
+                        />
+                    </LocalizationProvider>
                 </Box>
 
-                <ToastContainer />
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <ReCAPTCHA
+                        sitekey={"6LfbKSQqAAAAAFXdxb9hN5dQYW_XkmmflREUQc_p"}  // CHANGE WHEN FREE
+                        onChange={handleRecaptchaChange}
+                    />
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <Button variant="contained" type="submit" disabled={!isCaptchaComplete}>
+                        Register
+                    </Button>
+                </Box>
             </Box>
+
+            <ToastContainer />
+        </Box>
 
     );
 }
