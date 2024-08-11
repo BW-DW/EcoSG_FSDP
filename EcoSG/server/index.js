@@ -18,6 +18,8 @@ app.get("/", (req, res) => {
 });
 
 // Routes
+const tutorialRoute = require('./routes/tutorial');
+app.use("/tutorial", tutorialRoute);
 const rewardRoute = require('./routes/reward');
 app.use("/reward", rewardRoute);
 const userRoute = require('./routes/user');
@@ -30,6 +32,8 @@ const facilityRoute = require('./routes/facilities');
 app.use("/facilities", facilityRoute);
 const contactRoute = require('./routes/contact');
 app.use(contactRoute);
+const stripeRoute = require('./routes/stripe');
+app.use(stripeRoute);
 
 const db = require('./models');
 db.sequelize.sync({ alter: true })

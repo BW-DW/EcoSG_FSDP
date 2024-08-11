@@ -51,7 +51,7 @@ function Donations() {
     return (
         <Box>
             <Typography variant="h5" sx={{ my: 2 }}>
-                View Donations
+                Make a Donation
             </Typography>
             
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -82,7 +82,7 @@ function Donations() {
       <button className="button">$10</button></Link>
       <Link to="/makedonations/20">
       <button className="button">$20</button></Link>
-      <Link to="/makedonationst/50">
+      <Link to="/makedonations/50">
       <button className="button">$50</button></Link>
       <Link to="/makedonations/100">
       <button className="button">$100</button></Link>

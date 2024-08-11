@@ -31,10 +31,12 @@ import ContactMessages from "./pages/ContactMessages";
 import UserFacilities from './pages/UserFacilities';
 import Donations from './pages/Donations';
 import Makedon from './pages/makeDon';
+import Makedonstaff from './pages/makeDonStaff.jsx';
 import Viewdon from './pages/viewDonations';
 import Updatedon from './pages/updateDonations';
 import Checkout from './pages/checkout';
 import ReceiptPage from './pages/receipt';
+import ReceiptCancel from './pages/receiptcancel';
 import UserDonation from './pages/userDonation';
 import Viewdonstaff from './pages/viewDonStaff';
 
@@ -248,11 +250,13 @@ function App() {
               <Route path="/donations" element={<Donations />} />
               <Route path="/makedonations" element={<Makedon />} />
               <Route path="/makedonations/:id" element={<Makedon />} />
+              <Route path="/makedonationstaff/:id" element={<Makedonstaff />} />
               <Route path="/viewdonations" element={<Viewdon />} />
               <Route path="/viewdonation/:id" element={<Viewdonstaff />} />
               <Route path="/updatedonations/:id" element={<Updatedon />} />
               <Route path="/checkout/:id" element={<Checkout />} />
-              <Route path="/receipt/:id" element={<ReceiptPage />} />
+              <Route path="/receipt" element={<ReceiptPage />} />
+              <Route path="/cancel" element={<ReceiptCancel />} />
               <Route path="/users" element={
                 <ProtectedRoute requiredRole="staff">
                   <UserTable />

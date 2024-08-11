@@ -17,44 +17,36 @@ function Viewdon() {
     const onSearchChange = (e) => {
         setSearch(e.target.value);
     };
-
     const getTutorials = () => {
         http.get('/tutorial').then((res) => {
             setTutorialList(res.data);
         });
     };
-
     const searchTutorials = () => {
         http.get(`/tutorial?search=${search}`).then((res) => {
             setTutorialList(res.data);
         });
     };
-
     useEffect(() => {
         getTutorials();
     }, []);
-
     const onSearchKeyDown = (e) => {
         if (e.key === "Enter") {
             searchTutorials();
         }
     };
-
     const onClickSearch = () => {
         searchTutorials();
     }
-
     const onClickClear = () => {
         setSearch('');
         getTutorials();
     };
-
     return (
         <Box>
             <Typography variant="h5" sx={{ my: 2 }}>
                 View Donations
             </Typography>
-
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Input value={search} placeholder="Search"
                     onChange={onSearchChange}
@@ -82,14 +74,15 @@ function Viewdon() {
                 {
                     tutorialList.map((tutorial, i) => {
                         return (
-                            <Grid item xs={12} md={6} lg={4} key={tutorial.id}>
-                                <Typography sx={{ color: 'white' }}>
+                            
+                                user && user.id === tutorial.userId && (
+                                    <Grid item xs={12} md={6} lg={4} key={tutorial.id}>
+                                {
+                                    
+                                <Card>
+                                    <Typography sx={{ color: 'white' }}>
                                 {amt+=tutorial.amount}
                                 </Typography>
-                                
-                                {
-                                user && user.id === tutorial.userId && (
-                                <Card>
                                     <CardContent>
                                         <Box sx={{ display: 'flex', mb: 1 }}>
                                             <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -124,9 +117,9 @@ function Viewdon() {
                                         </Typography>
                                     </CardContent>
                                 </Card>
-                                )}
+                                }
                             </Grid>
-                        );
+                        ));
                     })
                 }
                 </Grid>
@@ -139,5 +132,4 @@ function Viewdon() {
         </Box>
     );
 }
-
 export default Viewdon;

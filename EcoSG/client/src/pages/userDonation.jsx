@@ -61,6 +61,32 @@ function UserDonation() {
         fetchUsers();
     }, [search, filter, order]);
 
+    const [tutorialList, setTutorialList] = useState([]);
+    const getTutorials = () => {
+        http.get('/tutorial').then((res) => {
+            setTutorialList(res.data);
+        });
+    };
+
+    useEffect(() => {
+        getTutorials();
+    }, []);
+
+
+    const calculateTutorialAmounts = () => {
+        const tutorialAmounts = {};
+      
+        users.forEach((user) => {
+          const userTutorials = tutorialList.filter((tutorial) => tutorial.userId === user.id);
+          const totalAmount = userTutorials.reduce((acc, tutorial) => acc + tutorial.amount, 0);
+          tutorialAmounts[user.id] = totalAmount;
+        });
+      
+        return tutorialAmounts;
+      };
+
+      let tutorialAmounts=calculateTutorialAmounts()
+
     // Handle search input changes
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
@@ -189,7 +215,6 @@ function UserDonation() {
                         <TableCell>Role</TableCell>
                         <TableCell>Email</TableCell>
                         <TableCell>Date of Birth (DoB)</TableCell>
-                        <TableCell>Points</TableCell>
                         <TableCell>Donations ($)</TableCell>
                         <TableCell>View User's Donations</TableCell>
                     </TableRow>
@@ -202,8 +227,7 @@ function UserDonation() {
                             <TableCell>{user.role}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.dob}</TableCell>
-                            <TableCell>{user.points !== null ? user.points : '0'}</TableCell>
-                            <TableCell>{user.donate !== null ? user.donate : '0'}</TableCell>
+                            <TableCell>{tutorialAmounts[user.id]}</TableCell>
                             <TableCell>
                                 <Link to={`/viewdonation/${user.id}`}>
                                     <Button variant="contained">

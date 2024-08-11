@@ -32,15 +32,10 @@ const ReceiptPage = ({ amount, description }) => {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2">
           <path d="M9 12L12 15L19 8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <h2>Transaction Details</h2>
+        <h2>Transaction Details:</h2>
         <ul>
           <li>
-            <span>Amount:</span>
-            <span>${id}</span>
-          </li>
-          <li>
-            <span>About Donation:</span>
-            <span>Your donation will be used to help create more events for the community</span>
+            <span>Payment Success!</span>
           </li>
         </ul>
         <h2>Thank you for your donation!</h2>

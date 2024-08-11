@@ -21,6 +21,7 @@
     "nanoid": "^3.3.7",
     "readable-stream": "^4.5.2",
     "sequelize": "^6.37.2",
+    "stripe": "^16.7.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

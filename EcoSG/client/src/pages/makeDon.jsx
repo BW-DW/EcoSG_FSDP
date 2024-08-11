@@ -4,6 +4,8 @@ import { Box, Typography, TextField, Button } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import http from '../http';
+import axios from 'axios';
+import UserContext from '../contexts/UserContext';
 
 function Makedon() {
     var amt = "";
@@ -11,6 +13,7 @@ function Makedon() {
     const navigate = useNavigate();
     // const { user } = useContext(UserContext);
     // const { user, setUser } = useContext(UserContext);
+
     const formik = useFormik({
         initialValues: {
             amount: id,
@@ -25,6 +28,7 @@ function Makedon() {
                 .max(500, 'Description must be at most 500 characters')
                 .required('Description is required')
         }),
+        
         onSubmit: (data) => {
             amt = data.amount.trim()
             data.amount = parseInt(data.amount.trim());
@@ -32,7 +36,6 @@ function Makedon() {
             http.post("/tutorial", data)
                 .then((res) => {
                     console.log(res.data);
-                    // // setUser({...user, donations: [...user.donations, data.amount] });
                     navigate(`/checkout/${amt}`);
                 });
         }
