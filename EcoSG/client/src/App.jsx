@@ -112,7 +112,11 @@ function App() {
           <AppBar position="static" className="AppBar">
             <Container>
               <Toolbar disableGutters={true}>
-                <Link to="/"><Typography variant="h6" component="div">EcoSG</Typography></Link>
+                <Link to="/"><img
+                  alt="EcoSG"
+                  src={`${import.meta.env.VITE_FILE_BASE_URL}EcoSG.png`}
+                  style={{ height: '70px', marginTop: '8px' }}
+                /></Link>
                 <Link to="/rewards"><Typography>Rewards</Typography></Link>
                 <Link to="/announcements"><Typography>Announcements</Typography></Link>
                 {user && user.role === 'staff' && (

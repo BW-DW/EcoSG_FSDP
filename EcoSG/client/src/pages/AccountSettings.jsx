@@ -51,42 +51,42 @@ function AccountSettings() {
         setFieldToEdit('');
     };
 
-const handleSave = async (newValue, currentPassword) => {
-    const updatedUser = { 
-        ...user, 
-        [fieldToEdit]: newValue,
-        verified: fieldToEdit === 'email' ? false : user.verified
-    };
-    setUser(updatedUser);
+    const handleSave = async (newValue, currentPassword) => {
+        const updatedUser = {
+            ...user,
+            [fieldToEdit]: newValue,
+            verified: fieldToEdit === 'email' ? false : user.verified
+        };
+        setUser(updatedUser);
 
-    const updateData = {
-        name: updatedUser.name,
-        email: updatedUser.email,
-        dob: updatedUser.dob,
-        password: fieldToEdit === 'password' ? newValue : undefined,
-        currentPassword: fieldToEdit === 'password' ? currentPassword : undefined,
-        verified: updatedUser.verified
-    };
+        const updateData = {
+            name: updatedUser.name,
+            email: updatedUser.email,
+            dob: updatedUser.dob,
+            password: fieldToEdit === 'password' ? newValue : undefined,
+            currentPassword: fieldToEdit === 'password' ? currentPassword : undefined,
+            verified: updatedUser.verified
+        };
 
-    try {
-        await http.put(`/user/${user.id}`, updateData);
-        toast.success(`${fieldToEdit} updated successfully`);
-        fetchUserData();
+        try {
+            await http.put(`/user/${user.id}`, updateData);
+            toast.success(`${fieldToEdit} updated successfully`);
+            fetchUserData();
 
-        // Notify user of changes
-        if (fieldToEdit === 'name') {
-            await http.post('/notify-username-change', { userId: user.id, newUsername: newValue });
-        } else if (fieldToEdit === 'email') {
-            await http.post('/notify-email-change', { userId: user.id, newEmail: newValue });
-        } else if (fieldToEdit === 'dob') {
-            await http.post('/notify-dob-change', { userId: user.id, newDob: newValue });
-        } else if (fieldToEdit === 'password') {
-            await http.post('/notify-password-change', { userId: user.id });
+            // Notify user of changes
+            if (fieldToEdit === 'name') {
+                await http.post('/notify-username-change', { userId: user.id, newUsername: newValue });
+            } else if (fieldToEdit === 'email') {
+                await http.post('/notify-email-change', { userId: user.id, newEmail: newValue });
+            } else if (fieldToEdit === 'dob') {
+                await http.post('/notify-dob-change', { userId: user.id, newDob: newValue });
+            } else if (fieldToEdit === 'password') {
+                await http.post('/notify-password-change', { userId: user.id });
+            }
+        } catch (err) {
+            throw new Error(err.response.data.message || 'Error updating field');
         }
-    } catch (err) {
-        throw new Error(err.response.data.message || 'Error updating field');
-    }
-};
+    };
 
     const DeleteAccount = () => {
         http.delete(`/user/${user.id}`).then(() => {
@@ -154,14 +154,27 @@ const handleSave = async (newValue, currentPassword) => {
                             <Typography>Password: <Button onClick={() => handleDialogOpen('password')}>Change Password</Button></Typography>
                             <Typography>Email: {user?.email} <Button onClick={() => handleDialogOpen('email')}>Change Email</Button>
                                 {!user?.verified && (
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        sx={{ ml: 2 }}
-                                        onClick={() => navigate('/verify-email')}
+                                    <Box
+                                        sx={{
+                                            mt: 1,
+                                            p: 1,
+                                            backgroundColor: '#687864', // Highlighted box color
+                                            color: '#ffffff',
+                                            borderRadius: 1,
+                                            textAlign: 'center',
+                                        }}
                                     >
-                                        Verify your email now
-                                    </Button>
+                                        <Typography sx={{ mb: 1 }}>
+                                            To enable 2FA and email notifications, please verify your email.
+                                        </Typography>
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            onClick={() => navigate('/verify-email')}
+                                        >
+                                            Verify Email
+                                        </Button>
+                                    </Box>
                                 )}
                             </Typography>
                             <Typography>Date of Birth: {dayjs(user?.dob).format('DD/MM/YYYY')} <Button onClick={() => handleDialogOpen('dob')}>Edit</Button></Typography>

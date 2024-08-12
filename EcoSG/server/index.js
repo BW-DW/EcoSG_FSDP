@@ -37,8 +37,8 @@ const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
     auth: {
-        user: 'bwgyanimate@gmail.com', // Your email address
-        pass: 'frqkodlqfpmpkmpd', // Your email password
+        user: 'ecosggov@gmail.com', // Your email address
+        pass: 'zixuhiqyfpzajjci', // Your email password
     },
 });
 
@@ -171,7 +171,7 @@ app.post('/send-verification-code', async (req, res) => {
     await user.save();
 
     const mailOptions = {
-        from: 'bwgyanimate@gmail.com',
+        from: 'ecosggov@gmail.com',
         to: user.email,
         subject: 'Your Verification Code',
         text: `Your verification code is: ${verificationCode}`,
@@ -219,7 +219,7 @@ app.post('/send-verification-code-pass', async (req, res) => {
     await user.save();
 
     const mailOptions = {
-        from: 'bwgyanimate@gmail.com',
+        from: 'ecosggov@gmail.com',
         to: user.email,
         subject: 'Your OTP Code',
         text: `Your OTP code is: ${otp}`,
@@ -290,7 +290,7 @@ app.post('/notify-username-change', async (req, res) => {
         const oldName = oldUserData[userId].oldName;
 
         const mailOptions = {
-            from: 'bwgyanimate@gmail.com',
+            from: 'ecosggov@gmail.com',
             to: user.email,
             subject: 'Username Change Notification',
             text: `Dear ${oldName},\n\nYour username has been changed to: ${newUsername}.\n\nIf you did not request this change, please contact support immediately.\n\nBest regards,\nEcoSG`
@@ -318,7 +318,7 @@ app.post('/notify-password-change', async (req, res) => {
     if (user.verified) {
 
         const mailOptions = {
-            from: 'bwgyanimate@gmail.com',
+            from: 'ecosggov@gmail.com',
             to: user.email,
             subject: 'Password Change Notification',
             text: `Dear ${user.name},\n\nYour password has been changed successfully.\n\nIf you did not request this change, please contact support immediately.\n\nBest regards,\nEcoSG`
@@ -346,7 +346,7 @@ app.post('/notify-dob-change', async (req, res) => {
     if (user.verified) {
 
         const mailOptions = {
-            from: 'bwgyanimate@gmail.com',
+            from: 'ecosggov@gmail.com',
             to: user.email,
             subject: 'Date of Birth Change Notification',
             text: `Dear ${user.name},\n\nYour date of birth has been updated to: ${newDob}.\n\nIf you did not request this change, please contact support immediately.\n\nBest regards,\nEcoSG`
@@ -381,7 +381,7 @@ app.post('/notify-email-change', async (req, res) => {
         const oldEmail = oldUserData[userId].oldEmail;
 
         const mailOptions = {
-            from: 'bwgyanimate@gmail.com',
+            from: 'ecosggov@gmail.com',
             to: oldEmail,
             subject: 'Email Change Notification',
             text: `Dear ${user.name},\n\nYour email address has been changed to: ${newEmail}.\nYou must verify your new email.\n\nIf you did not request this change, please contact support immediately.\n\nBest regards,\nEcoSG`
@@ -409,7 +409,7 @@ app.post("/user/notify-login", async (req, res) => {
 
         if (user.verified) {
             const mailOptions = {
-                from: 'bwgyanimate@gmail.com',
+                from: 'ecosggov@gmail.com',
                 to: user.email,
                 subject: 'New Login Detected',
                 text: `Dear ${user.name},\n\nA new login to your account was detected on ${new Date().toLocaleString()}.\n\nIf this was not you, please contact support immediately.\n\nBest regards,\nEcoSG`
