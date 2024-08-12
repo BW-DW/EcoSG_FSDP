@@ -49,6 +49,8 @@ import ReceiptPage from './pages/receipt';
 import ReceiptCancel from './pages/receiptcancel';
 import UserDonation from './pages/userDonation';
 import Viewdonstaff from './pages/viewDonStaff';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgetPassword from './pages/ForgetPassword';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -117,7 +119,11 @@ function App() {
           <AppBar position="static" className="AppBar">
             <Container>
               <Toolbar disableGutters={true}>
-                <Link to="/"><Typography variant="h6" component="div">EcoSG</Typography></Link>
+                <Link to="/"><img
+                  alt="EcoSG"
+                  src={`${import.meta.env.VITE_FILE_BASE_URL}EcoSG.png`}
+                  style={{ height: '70px', marginTop: '8px' }}
+                /></Link>
                 <Link to="/rewards"><Typography>Rewards</Typography></Link>
                 <Link to="/announcements"><Typography>Announcements</Typography></Link>
                 {user && user.role === 'staff' && (
@@ -306,7 +312,9 @@ function App() {
               <Route path="/loginout/:id" element={<LoginOut />} />
               <Route path="/logindonupdate/:id" element={<LoginDonUpdate />} />
               <Route path="/loginoutupdate" element={<LoginOutUpdate />} />
+              <Route path="/forgetpassword" element={<ForgetPassword />} />
               <Route path="/account" element={<AccountSettings />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/accountdeleted" element={<AccountDeleted />} />
               <Route path="/form" element={<MyForm />} />
               <Route path="/donations" element={<Donations />} />

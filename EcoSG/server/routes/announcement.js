@@ -4,23 +4,81 @@ const { User, Announcement } = require('../models');
 const { Op } = require("sequelize");
 const yup = require("yup");
 const { validateToken } = require('../middlewares/auth');
+const nodemailer = require('nodemailer');
+
+async function sendEmails(announcement) {
+    let recipients;
+
+    if (announcement.for === 'customer') {
+        // Get all verified customers
+        recipients = await User.findAll({
+            where: {
+                verified: true
+            }
+        });
+    } else if (announcement.for === 'staff') {
+        // Get all verified staff
+        recipients = await User.findAll({
+            where: {
+                role: 'staff',
+                verified: true
+            }
+        });
+    }
+
+    // Set up email content
+    const emailContent = {
+        subject: `${announcement.type !== 'default' ? announcement.type.toUpperCase() + ' ' : ''} New Announcement: ${announcement.subject}`,
+        text: `${announcement.description}\n\nCreated at: ${announcement.createdAt}`,
+    };
+
+    // Set up email transporter
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        auth: {
+            user: 'ecosggov@gmail.com', // Your email address
+            pass: 'zixuhiqyfpzajjci', // Your email password
+        },
+    });
+
+    // Send emails to all recipients
+    recipients.forEach(user => {
+        transporter.sendMail({
+            from: 'ecosggov@gmail.com',
+            to: user.email,
+            subject: emailContent.subject,
+            text: emailContent.text,
+        }, (error, info) => {
+            if (error) {
+                console.error(`Error sending email to ${user.email}:`, error);
+            } else {
+                console.log(`Email sent to ${user.email}:`, info.response);
+            }
+        });
+    });
+}
 
 router.post("/", validateToken, async (req, res) => {
     let data = req.body;
     data.userId = req.user.id;
-    // Validate request body
+    
     let validationSchema = yup.object({
         subject: yup.string().trim().min(3).max(100).required(),
         type: yup.string().oneOf(['default', 'important', 'urgent']).required(),
         description: yup.string().trim().min(3).required(),
         for: yup.string().oneOf(['staff', 'customer']).required()
     });
+
     try {
         data = await validationSchema.validate(data, { abortEarly: false });
         let result = await Announcement.create(data);
+
+        // Send emails after creating the announcement
+        await sendEmails(result);
+
         res.json(result);
-    }
-    catch (err) {
+    } catch (err) {
         res.status(400).json({ errors: err.errors });
     }
 });
@@ -81,23 +139,24 @@ router.put("/:id", validateToken, async (req, res) => {
         description: yup.string().trim().min(3),
         for: yup.string().oneOf(['staff', 'customer'])
     });
+
     try {
         data = await validationSchema.validate(data, { abortEarly: false });
         let num = await Announcement.update(data, {
             where: { id: id }
         });
         if (num == 1) {
+            let updatedAnnouncement = await Announcement.findByPk(id); // Fetch updated announcement
+            await sendEmails(updatedAnnouncement); // Send emails
             res.json({
                 message: "Announcement was updated successfully."
             });
-        }
-        else {
+        } else {
             res.status(400).json({
                 message: `Cannot update announcement with id ${id}.`
             });
         }
-    }
-    catch (err) {
+    } catch (err) {
         res.status(400).json({ errors: err.errors });
     }
 });
