@@ -9,7 +9,9 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import http from '../http';
 import { useFormik } from 'formik';
@@ -30,6 +32,7 @@ function UserTableEdit() {
       name: '',
       email: '',
       dob: '',
+      verified: false, // Add the verified field
     },
     validationSchema: yup.object({
       name: yup.string().trim().min(3).max(50).required("Name is required"),
@@ -43,6 +46,7 @@ function UserTableEdit() {
         const updateData = {
           name: data.name,
           email: data.email,
+          verified: data.verified, // Include the verified field in the update data
           // dob: data.dob,
         };
 
@@ -151,6 +155,16 @@ function UserTableEdit() {
             shrink: true,
           }}
         /> */}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={formik.values.verified}
+              onChange={(event) => formik.setFieldValue('verified', event.target.checked)}
+              color="primary"
+            />
+          }
+          label="Verified"
+        />
         <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
           <Button variant="contained" type="submit">
             Update
