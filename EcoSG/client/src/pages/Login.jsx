@@ -22,6 +22,15 @@ function Login() {
         setRecaptchaToken(token);
     };
 
+    const notifyLogin = async (userId) => {
+        try {
+            await http.post("/user/notify-login", { userId });
+            toast.success('Login notification sent!');
+        } catch (err) {
+            toast.error('Failed to send login notification');
+        }
+    };
+
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -45,6 +54,8 @@ function Login() {
                     localStorage.setItem("accessToken", res.data.accessToken);
                     setUser(res.data.user);
                     toast.success('Login successful!');
+
+                    notifyLogin(res.data.user.id);
                     navigate("/");
                 })
                 .catch(function (err) {

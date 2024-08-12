@@ -396,3 +396,38 @@ app.post('/notify-email-change', async (req, res) => {
         }
     }
 });
+
+app.post("/user/notify-login", async (req, res) => {
+    const { userId } = req.body;
+
+    try {
+        const user = await getUserById(userId);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        if (user.verified) {
+            const mailOptions = {
+                from: 'bwgyanimate@gmail.com',
+                to: user.email,
+                subject: 'New Login Detected',
+                text: `Dear ${user.name},\n\nA new login to your account was detected on ${new Date().toLocaleString()}.\n\nIf this was not you, please contact support immediately.\n\nBest regards,\nEcoSG`
+            };
+
+            try {
+                await transporter.sendMail(mailOptions);
+                res.json({ success: true, message: 'Login notification email sent successfully' });
+            } catch (error) {
+                console.error('Error sending login notification email:', error);
+                res.status(500).json({ success: false, message: 'Failed to send login notification email' });
+            }
+        } else {
+            res.json({ success: false, message: 'User is not verified' });
+        }
+
+    } catch (error) {
+        console.error('Error notifying login:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
