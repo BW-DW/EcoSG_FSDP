@@ -114,7 +114,7 @@ function UserTable() {
                         value={filter}
                         onChange={handleFilterChange}
                         displayEmpty
-                        renderValue={(value) => value === '' ? 'All' : value}
+                        renderValue={(value) => (value === '' ? 'All' : value)}
                         sx={{ ml: 2 }}
                     >
                         <MenuItem value="">All</MenuItem>
@@ -131,6 +131,7 @@ function UserTable() {
                         <TableCell>Email</TableCell>
                         <TableCell>Date of Birth</TableCell>
                         <TableCell>Role</TableCell>
+                        <TableCell>Verified</TableCell>
                         <TableCell>Created</TableCell>
                         <TableCell>Last Updated</TableCell>
                         <TableCell>Edit</TableCell>
@@ -145,6 +146,7 @@ function UserTable() {
                             <TableCell>{tableUser.email}</TableCell>
                             <TableCell>{tableUser.dob}</TableCell>
                             <TableCell>{tableUser.role}</TableCell>
+                            <TableCell>{tableUser.verified ? 'Yes' : 'No'}</TableCell> {/* New Verified Column */}
                             <TableCell>{new Date(tableUser.createdAt).toLocaleString()}</TableCell>
                             <TableCell>{new Date(tableUser.updatedAt).toLocaleString()}</TableCell>
                             <TableCell>
