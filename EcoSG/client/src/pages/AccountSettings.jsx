@@ -51,31 +51,42 @@ function AccountSettings() {
         setFieldToEdit('');
     };
 
-    const handleSave = async (newValue, currentPassword) => {
-        const updatedUser = { 
-            ...user, 
-            [fieldToEdit]: newValue,
-            verified: fieldToEdit === 'email' ? false : user.verified
-        };
-        setUser(updatedUser);
-
-        const updateData = {
-            name: updatedUser.name,
-            email: updatedUser.email,
-            dob: updatedUser.dob,
-            password: fieldToEdit === 'password' ? newValue : undefined,
-            currentPassword: fieldToEdit === 'password' ? currentPassword : undefined, // Include current password only if updating password
-            verified: updatedUser.verified // Include the updated verified status
-        };
-
-        try {
-            await http.put(`/user/${user.id}`, updateData);
-            toast.success(`${fieldToEdit} updated successfully`);
-            fetchUserData();
-        } catch (err) {
-            throw new Error(err.response.data.message || 'Error updating field');
-        }
+const handleSave = async (newValue, currentPassword) => {
+    const updatedUser = { 
+        ...user, 
+        [fieldToEdit]: newValue,
+        verified: fieldToEdit === 'email' ? false : user.verified
     };
+    setUser(updatedUser);
+
+    const updateData = {
+        name: updatedUser.name,
+        email: updatedUser.email,
+        dob: updatedUser.dob,
+        password: fieldToEdit === 'password' ? newValue : undefined,
+        currentPassword: fieldToEdit === 'password' ? currentPassword : undefined,
+        verified: updatedUser.verified
+    };
+
+    try {
+        await http.put(`/user/${user.id}`, updateData);
+        toast.success(`${fieldToEdit} updated successfully`);
+        fetchUserData();
+
+        // Notify user of changes
+        if (fieldToEdit === 'name') {
+            await http.post('/notify-username-change', { userId: user.id, newUsername: newValue });
+        } else if (fieldToEdit === 'email') {
+            await http.post('/notify-email-change', { userId: user.id, newEmail: newValue });
+        } else if (fieldToEdit === 'dob') {
+            await http.post('/notify-dob-change', { userId: user.id, newDob: newValue });
+        } else if (fieldToEdit === 'password') {
+            await http.post('/notify-password-change', { userId: user.id });
+        }
+    } catch (err) {
+        throw new Error(err.response.data.message || 'Error updating field');
+    }
+};
 
     const DeleteAccount = () => {
         http.delete(`/user/${user.id}`).then(() => {
@@ -171,6 +182,7 @@ function AccountSettings() {
                 handleClose={handleDialogClose}
                 field={fieldToEdit}
                 handleSave={handleSave}
+                userId={user?.id}
             />
 
             <Dialog

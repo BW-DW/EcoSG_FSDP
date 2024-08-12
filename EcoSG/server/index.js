@@ -3,6 +3,7 @@ const axios = require('axios');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const { User } = require('./models');
+const oldUserData = {};
 require('dotenv').config();
 
 const app = express();
@@ -85,7 +86,7 @@ db.sequelize.sync({ alter: true })
     .then(() => {
         let port = process.env.APP_PORT;
         app.listen(port, () => {
-            console.log(`⚡ Sever running on http://localhost:${port}`);
+            console.log(`⚡ Server is running on http://localhost:${port}`);
         });
     })
     .catch((err) => {
@@ -244,22 +245,154 @@ app.post('/verify-otp', async (req, res) => {
     res.json({ success: true, message: 'OTP verified successfully' });
 });
 
+app.post('/save-old-data', async (req, res) => {
+    const { userId } = req.body;
 
+    if (!userId) {
+        return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
 
-// // Reset Password
-// app.put('/user/reset-password', async (req, res) => {
-//     const { email, otp, password } = req.body;
-//     const user = await User.findOne({ where: { email, verificationCode: otp } });
+    try {
+        const user = await getUserById(userId);
 
-//     if (!user) {
-//         return res.status(400).json({ message: 'Invalid or expired OTP' });
-//     }
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
-//     // Hash the new password and save it to the database
-//     user.password = await bcrypt.hash(password, 10);
-//     user.verificationCode = ""; // Clear the OTP
-//     await user.save();
+        // Store the old data
+        oldUserData[userId] = {
+            oldName: user.name,
+            oldEmail: user.email,
+            oldDob: user.dob
+        };
 
-//     res.json({ message: 'Password has been reset successfully' });
-// });
+        res.json({ success: true, message: 'Old data saved successfully' });
+    } catch (error) {
+        console.error('Error saving old data:', error);
+        res.status(500).json({ success: false, message: 'Failed to save old data' });
+    }
+});
 
+// Notify user of username change
+app.post('/notify-username-change', async (req, res) => {
+    const { userId, newUsername } = req.body;
+    const user = await getUserById(userId);
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!oldUserData[userId]) {
+        return res.status(404).json({ success: false, message: 'Old data not available' });
+    }
+
+    if (user.verified) {
+        const oldName = oldUserData[userId].oldName;
+
+        const mailOptions = {
+            from: 'bwgyanimate@gmail.com',
+            to: user.email,
+            subject: 'Username Change Notification',
+            text: `Dear ${oldName},\n\nYour username has been changed to: ${newUsername}.\n\nIf you did not request this change, please contact support immediately.\n\nBest regards,\nEcoSG`
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            res.json({ success: true, message: 'Notification sent successfully' });
+        } catch (error) {
+            console.error('Error sending email:', error);
+            res.status(500).json({ success: false, message: 'Failed to send notification' });
+        }
+    }
+});
+
+// Notify user of password change
+app.post('/notify-password-change', async (req, res) => {
+    const { userId } = req.body;
+    const user = await getUserById(userId);
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.verified) {
+
+        const mailOptions = {
+            from: 'bwgyanimate@gmail.com',
+            to: user.email,
+            subject: 'Password Change Notification',
+            text: `Dear ${user.name},\n\nYour password has been changed successfully.\n\nIf you did not request this change, please contact support immediately.\n\nBest regards,\nEcoSG`
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            res.json({ success: true, message: 'Notification sent successfully' });
+        } catch (error) {
+            console.error('Error sending email:', error);
+            res.status(500).json({ success: false, message: 'Failed to send notification' });
+        }
+    }
+});
+
+// Notify user of date of birth change
+app.post('/notify-dob-change', async (req, res) => {
+    const { userId, newDob } = req.body;
+    const user = await getUserById(userId);
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.verified) {
+
+        const mailOptions = {
+            from: 'bwgyanimate@gmail.com',
+            to: user.email,
+            subject: 'Date of Birth Change Notification',
+            text: `Dear ${user.name},\n\nYour date of birth has been updated to: ${newDob}.\n\nIf you did not request this change, please contact support immediately.\n\nBest regards,\nEcoSG`
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            res.json({ success: true, message: 'Notification sent successfully' });
+        } catch (error) {
+            console.error('Error sending email:', error);
+            res.status(500).json({ success: false, message: 'Failed to send notification' });
+        }
+
+    }
+});
+
+// Notify user of email change
+app.post('/notify-email-change', async (req, res) => {
+    const { userId, newEmail } = req.body;
+    const user = await getUserById(userId);
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!oldUserData[userId]) {
+        return res.status(404).json({ success: false, message: 'Old data not available' });
+    }
+
+    if (user.verified) {
+
+        const oldEmail = oldUserData[userId].oldEmail;
+
+        const mailOptions = {
+            from: 'bwgyanimate@gmail.com',
+            to: oldEmail,
+            subject: 'Email Change Notification',
+            text: `Dear ${user.name},\n\nYour email address has been changed to: ${newEmail}.\nYou must verify your new email.\n\nIf you did not request this change, please contact support immediately.\n\nBest regards,\nEcoSG`
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            res.json({ success: true, message: 'Notification sent successfully' });
+        } catch (error) {
+            console.error('Error sending email:', error);
+            res.status(500).json({ success: false, message: 'Failed to send notification' });
+        }
+    }
+});
