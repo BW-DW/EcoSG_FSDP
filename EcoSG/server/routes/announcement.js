@@ -10,11 +10,20 @@ async function sendEmails(announcement) {
     let recipients;
 
     if (announcement.for === 'customer') {
-        // Get all customers
-        recipients = await User.findAll();
+        // Get all verified customers
+        recipients = await User.findAll({
+            where: {
+                verified: true
+            }
+        });
     } else if (announcement.for === 'staff') {
-        // Get all staff
-        recipients = await User.findAll({ where: { role: 'staff' } });
+        // Get all verified staff
+        recipients = await User.findAll({
+            where: {
+                role: 'staff',
+                verified: true
+            }
+        });
     }
 
     // Set up email content
