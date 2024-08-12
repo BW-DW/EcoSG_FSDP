@@ -19,6 +19,7 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.9.3",
     "nanoid": "^3.3.7",
+    "nodemailer": "^6.9.14",
     "readable-stream": "^4.5.2",
     "sequelize": "^6.37.2",
     "stripe": "^16.7.0",

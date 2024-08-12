@@ -1,30 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './receipt.css';
 import { useParams, useNavigate } from 'react-router-dom';
+import UserContext from '../contexts/UserContext';
 
-const ReceiptPage = ({ amount, description }) => {
-  // const [tutorialList, setTutorialList] = useState([]);
+const ReceiptPage = () => {
   const { id } = useParams();
-  const tickIcon = document.querySelector('#tick-icon');
+  const [sent, setSent] = useState(false);
+  const { user } = useContext(UserContext);
 
-  document.addEventListener('DOMContentLoaded', () => {
-    tickIcon.classList.add('active');
-  });
-  // const navigate = useNavigate();
-  // const { user } = useContext(UserContext);
-  // const getTutorials = () => {
-  //     http.get('/tutorial').then((res) => {
-  //         setTutorialList(res.data);
-  //     });
-  // };
-  // useEffect(() => {
-  //     getTutorials();
-  // }, []);
-  // for (let i = 0; i < tutorialList.length; i++) {
-  //     if (tutorialList[i].amount == id) {
-  //         newtut=tutorialList[i];
-  //       }
-  //   };
+  const handleSendReceipt = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/send_receipt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email:user.email }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSent(true);
+      } else {
+        console.error(data.error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="receipt-container">
       <h1>Receipt</h1>
@@ -40,6 +41,9 @@ const ReceiptPage = ({ amount, description }) => {
         </ul>
         <h2>Thank you for your donation!</h2>
         <p>Your contribution will make a big difference in our community.</p>
+        <button onClick={handleSendReceipt} className="btn-submit">
+          {sent ? 'Sent!' : 'Send copy of receipt to email'}
+        </button>
       </div>
     </div>
   );

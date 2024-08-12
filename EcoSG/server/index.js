@@ -36,6 +36,8 @@ const contactRoute = require('./routes/contact');
 app.use(contactRoute);
 const stripeRoute = require('./routes/stripe');
 app.use(stripeRoute);
+const donRoute = require('./routes/donEmail');
+app.use(donRoute);
 
 const db = require('./models');
 db.sequelize.sync({ alter: true })

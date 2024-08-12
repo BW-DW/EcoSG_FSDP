@@ -67,3 +67,51 @@
     background-color: #ccc;
     cursor: not-allowed;
   }
+
+  .checkout-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .checkout-header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .checkout-content {
+    padding: 20px;
+  }
+  
+  .donation-amount {
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    color: #FF0000;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  .btn-submit {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .btn-submit:hover {
+    background-color: #3e8e41;
+  }
+  
+  .btn-submit:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }

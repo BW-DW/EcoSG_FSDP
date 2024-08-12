@@ -6,6 +6,7 @@ import http from '../http';
 import dayjs from 'dayjs';
 import UserContext from '../contexts/UserContext';
 import global from '../global';
+import './viewDon.css';
 
 function Viewdonstaff() {
     let amt=0

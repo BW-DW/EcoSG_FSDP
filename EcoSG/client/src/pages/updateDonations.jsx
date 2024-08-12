@@ -36,12 +36,12 @@ function Updatedon() {
                 .required('Description is required')
         }),
         onSubmit: (data) => {
-            data.amount = parseInt(data.amount.trim());
+            data.amount = parseInt(data.amount);
             data.description = data.description.trim();
             http.put(`/tutorial/${id}`, data)
                 .then((res) => {
                     console.log(res.data);
-                    navigate("/viewdonations");
+                    navigate("/");
                 });
         }
     });

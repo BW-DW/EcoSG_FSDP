@@ -23,3 +23,82 @@
   .button:hover {
     background-color: #3e8e41;
   }
+
+  /* Add a hover effect to the donation buttons */
+.button {
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Add a transition effect */
+}
+
+.button:hover {
+  background-color: #3e8e41;
+}
+
+/* Add a pulse effect to the donation buttons */
+.button {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Add a focus effect to the search input */
+.search-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease; /* Add a transition effect */
+}
+
+.search-input:focus {
+  border-color: #aaa;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Add a slide-in effect to the search bar */
+.search-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.search-bar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.search-bar:focus-within::before {
+  transform: translateX(0);
+}
+
+/* Add a fade-in effect to the search results */
+.search-results {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.search-results.show {
+  opacity: 1;
+}
+
