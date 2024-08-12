@@ -43,7 +43,7 @@ import ReceiptPage from './pages/receipt';
 import UserDonation from './pages/userDonation';
 import Viewdonstaff from './pages/viewDonStaff';
 import VerifyEmail from './pages/VerifyEmail';
-import ForgotPassword from './pages/forgotPassword';
+import ForgetPassword from './pages/ForgetPassword';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -297,7 +297,7 @@ function App() {
               <Route path="/createevent" element={<CreateEvent />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/forgotpassword" element={<ForgotPassword />} />
+              <Route path="/forgetpassword" element={<ForgetPassword />} />
               <Route path="/account" element={<AccountSettings />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/accountdeleted" element={<AccountDeleted />} />

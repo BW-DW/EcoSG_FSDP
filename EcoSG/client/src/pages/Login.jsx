@@ -111,7 +111,7 @@ function Login() {
             <Button
                 variant="text"
                 sx={{ mt: 2 }}
-                onClick={() => navigate("/forgotpassword")}
+                onClick={() => navigate("/forgetpassword")}
             >
                 Forgot Password?
             </Button>

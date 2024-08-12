@@ -291,7 +291,37 @@ router.put('/:id/role/customer', async (req, res) => {
     }
 });
 
+// Reset Password Route
+router.put('/:email/reset-password', async (req, res) => {
+    const { email } = req.params;
+    const { otp, password } = req.body;
 
+    // Find the user based on email and OTP
+    const user = await User.findOne({ where: { email, verificationCode: otp } });
+
+    if (!user) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    // Validate the new password
+    const validationSchema = yup.object({
+        password: yup.string().trim().min(8).required()
+            .matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/, "Password must have at least 1 letter and 1 number")
+    });
+
+    try {
+        const data = await validationSchema.validate({ password }, { abortEarly: false });
+
+        // Hash the new password and save it to the database
+        user.password = await bcrypt.hash(data.password, 10);
+        user.verificationCode = ""; // Clear the OTP
+        await user.save();
+
+        res.json({ message: 'Password has been reset successfully' });
+    } catch (err) {
+        return res.status(400).json({ errors: err.errors });
+    }
+});
 
 
 module.exports = router;

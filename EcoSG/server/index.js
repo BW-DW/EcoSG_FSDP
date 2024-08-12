@@ -204,32 +204,62 @@ app.post('/verify-email', async (req, res) => {
     }
 });
 
-app.post('/user/reset-password', async (req, res) => {
-    const { token, email, newPassword } = req.body;
+// Send OTP
+app.post('/send-verification-code-pass', async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const otp = generateVerificationCode();
+    user.verificationCode = otp;
+    await user.save();
+
+    const mailOptions = {
+        from: 'bwgyanimate@gmail.com',
+        to: user.email,
+        subject: 'Your OTP Code',
+        text: `Your OTP code is: ${otp}`,
+    };
 
     try {
-        const user = await User.findOne({
-            where: {
-                email,
-                resetToken: token,
-                resetTokenExpires: { [Op.gt]: Date.now() }
-            }
-        });
-
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired token' });
-        }
-
-        // Hash the new password and save it to the database
-        user.password = await bcrypt.hash(newPassword, 10);
-        user.resetToken = null; // Clear the reset token
-        user.resetTokenExpires = null; // Clear the token expiration
-        await user.save();
-
-        res.json({ message: 'Password has been reset successfully' });
-
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true, message: 'OTP sent successfully' });
     } catch (error) {
-        console.error('Error resetting password:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ success: false, message: 'Failed to send OTP' });
     }
 });
+
+// Verify OTP
+app.post('/verify-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    const user = await User.findOne({ where: { email, verificationCode: otp } });
+
+    if (!user) {
+        return res.status(400).json({ success: false, message: 'Invalid OTP' });
+    }
+
+    res.json({ success: true, message: 'OTP verified successfully' });
+});
+
+
+
+// // Reset Password
+// app.put('/user/reset-password', async (req, res) => {
+//     const { email, otp, password } = req.body;
+//     const user = await User.findOne({ where: { email, verificationCode: otp } });
+
+//     if (!user) {
+//         return res.status(400).json({ message: 'Invalid or expired OTP' });
+//     }
+
+//     // Hash the new password and save it to the database
+//     user.password = await bcrypt.hash(password, 10);
+//     user.verificationCode = ""; // Clear the OTP
+//     await user.save();
+
+//     res.json({ message: 'Password has been reset successfully' });
+// });
+
