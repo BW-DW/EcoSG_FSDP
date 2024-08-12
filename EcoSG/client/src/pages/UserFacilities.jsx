@@ -1,92 +1,97 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Box, Typography, Grid, Card, CardContent, Input, IconButton, Button, Checkbox, FormControlLabel, MenuItem, Select } from '@mui/material';
-import { AccountCircle, AccessTime, Search, Clear, Edit } from '@mui/icons-material';
+import { useNavigate, useLocation } from 'react-router-dom';
+import {
+    Box, Typography, Grid, Card, CardContent, Input, IconButton, Button, Checkbox, FormControlLabel, Modal
+} from '@mui/material';
+import { Search, Clear, Close } from '@mui/icons-material';
 import http from '../http';
-import dayjs from 'dayjs';
 import UserContext from '../contexts/UserContext';
-import global from '../global';
 
 const locations = ["Central", "North", "South", "East", "West"];
 const facilityTypes = ["Court", "Multi-purpose Hall", "Park"];
 
-function Facilities() {
+function UserFacilities() {
     const [facilityList, setFacilityList] = useState([]);
+    const [filteredList, setFilteredList] = useState([]);
     const [search, setSearch] = useState('');
     const [selectedLocations, setSelectedLocations] = useState([]);
     const [selectedFacilityTypes, setSelectedFacilityTypes] = useState([]);
+    const [selectedFacility, setSelectedFacility] = useState(null);
     const { user } = useContext(UserContext);
     const navigate = useNavigate();
-
-    // const updateURL = () => {
-    //     let query = `?search=${search}`;
-    //     if (selectedLocations.length > 0) {
-    //         query += `&locations=${selectedLocations.join(",")}`;
-    //     }
-    //     if (selectedFacilityTypes.length > 0) {
-    //         query += `&facilityTypes=${selectedFacilityTypes.join(",")}`;
-    //     }
-    //     navigate(`/facilities${query}`);
-    // };
-
-    const onSearchChange = (e) => {
-        setSearch(e.target.value);
-    };
+    const location = useLocation();
 
     const updateURL = () => {
         const query = `?search=${search}&locations=${selectedLocations.join(",")}&facilityTypes=${selectedFacilityTypes.join(",")}`;
-        navigate(`/facilities${query}`);
+        navigate(`/userfacilities${query}`);
     };
 
-
-    const getFacilities = () => {
-        http.get('/facilities').then((res) => {
-            setFacilityList(res.data);
-        });
-    };
-
-    // const searchFacilities = () => {
-    //     let query = `/facilities?search=${search}`;
-    //     if (selectedLocations.length > 0) {
-    //         query += `&locations=${selectedLocations.join(",")}`;
-    //     }
-    //     if (selectedFacilityTypes.length > 0) {
-    //         query += `&facilityTypes=${selectedFacilityTypes.join(",")}`;
-    //     }
-    //     console.log('Query:', query); // Log the constructed query
-    //     http.get(query).then((res) => {
-    //         setFacilityList(res.data);
-    //         console.log('Updated facilityList:', facilityList); // Log the updated data
-    //     });
-    // };
-    const searchFacilities = () => {
-        const query = `/facilities?search=${search}&locations=${selectedLocations.join(",")}&facilityTypes=${selectedFacilityTypes.join(",")}`;
-        http.get(query).then((res) => {
-            setFacilityList(res.data);
-        });
-    };
-    useEffect(() => {
-        console.log('Updated facilityList:', facilityList);
-    }, [facilityList]);
-    useEffect(() => {
-        getFacilities();
-    }, []);
-
-    const onSearchKeyDown = (e) => {
-        if (e.key === "Enter") {
-            searchFacilities();
+    const fetchFacilities = async () => {
+        const query = `/facilities`;
+        console.log("Fetching all facilities...");
+        try {
+            const res = await http.get(query);
+            if (Array.isArray(res.data)) {
+                setFacilityList(res.data);
+                console.log("Facilities fetched:", res.data);
+            } else {
+                console.error('API response is not an array:', res.data);
+            }
+        } catch (err) {
+            console.error('Error fetching facilities:', err);
         }
     };
 
-    const onClickSearch = () => {
-        searchFacilities();
+    const filterFacilities = () => {
+        const filteredData = facilityList.filter(facility => {
+            const matchesSearch = facility.name.toLowerCase().includes(search.toLowerCase());
+            const matchesLocation = selectedLocations.length === 0 || selectedLocations.includes(facility.location);
+            const matchesType = selectedFacilityTypes.length === 0 || selectedFacilityTypes.includes(facility.facilityType);
+            return matchesSearch && matchesLocation && matchesType;
+        });
+        setFilteredList(filteredData);
+        console.log("Filtered results:", filteredData);
     };
 
-    const onClickClear = () => {
+    useEffect(() => {
+        fetchFacilities();
+    }, []);
+
+    useEffect(() => {
+        filterFacilities();
+        updateURL();
+    }, [search, selectedLocations, selectedFacilityTypes, facilityList]);
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const search = queryParams.get('search') || '';
+        const locations = queryParams.get('locations') ? queryParams.get('locations').split(',') : [];
+        const facilityTypes = queryParams.get('facilityTypes') ? queryParams.get('facilityTypes').split(',') : [];
+        setSearch(search);
+        setSelectedLocations(locations);
+        setSelectedFacilityTypes(facilityTypes);
+    }, [location.search]);
+
+    const handleSearchChange = (e) => {
+        setSearch(e.target.value);
+    };
+
+    const handleSearchKeyDown = (e) => {
+        if (e.key === "Enter") {
+            filterFacilities();
+        }
+    };
+
+    const handleSearchClick = () => {
+        filterFacilities();
+    };
+
+    const handleClearClick = () => {
         setSearch('');
         setSelectedLocations([]);
         setSelectedFacilityTypes([]);
-        getFacilities();
+        fetchFacilities();
+        navigate('/userfacilities');
     };
 
     const handleLocationChange = (e) => {
@@ -94,8 +99,6 @@ function Facilities() {
         setSelectedLocations((prev) =>
             checked ? [...prev, name] : prev.filter((loc) => loc !== name)
         );
-        updateURL(); // Update URL when filter changes
-        searchFacilities(); // Call searchFacilities when filter changes
     };
 
     const handleFacilityTypeChange = (e) => {
@@ -103,49 +106,37 @@ function Facilities() {
         setSelectedFacilityTypes((prev) =>
             checked ? [...prev, name] : prev.filter((type) => type !== name)
         );
-        updateURL(); // Update URL when filter changes
-        searchFacilities(); // Call searchFacilities when filter changes
     };
 
-    useEffect(() => {
-        console.log('URL changed:', window.location.search);
-        // Fetch facilities based on URL parameters
-        const queryParams = new URLSearchParams(window.location.search);
-        const search = queryParams.get('search') || '';
-        const locations = queryParams.get('locations') ? queryParams.get('locations').split(',') : [];
-        const facilityTypes = queryParams.get('facilityTypes') ? queryParams.get('facilityTypes').split(',') : [];
-        console.log('Query params:', search, locations, facilityTypes);
-        setSearch(search);
-        setSelectedLocations(locations);
-        setSelectedFacilityTypes(facilityTypes);
+    const handleViewDetails = (facility) => {
+        setSelectedFacility(facility);
+    };
 
-        // Fetch facilities based on filters
-        searchFacilities();
-    }, [window.location.search]); // Re-run when URL changes
+    const handleCloseModal = () => {
+        setSelectedFacility(null);
+    };
+
     return (
-        <Box>
-            <Typography variant="h5" sx={{ my: 2 }}>
-                Facilities
-            </Typography>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Input value={search} placeholder="Search"
-                    onChange={onSearchChange}
-                    onKeyDown={onSearchKeyDown} />
-                <IconButton color="primary"
-                    onClick={onClickSearch}>
-                    <Search />
-                </IconButton>
-                <IconButton color="primary"
-                    onClick={onClickClear}>
-                    <Clear />
-                </IconButton>
-                <Box sx={{ flexGrow: 1 }} />
-            </Box>
-
-            <Box sx={{ display: 'flex', mb: 2 }}>
-                <Box sx={{ mr: 2 }}>
-                    <Typography variant="subtitle1">Filters by Location</Typography>
+        <Box sx={{ display: 'flex' }}>
+            {/* Left Sidebar for Search and Filters */}
+            <Box sx={{ width: 300, minWidth: 300, maxWidth: 300, p: 2, borderRight: '1px solid #ddd', boxSizing: 'border-box' }}>
+                <Typography variant="h5" sx={{ mb: 2 }}>
+                    Filters
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Input value={search} placeholder="Search"
+                        onChange={handleSearchChange}
+                        onKeyDown={handleSearchKeyDown}
+                        fullWidth />
+                    <IconButton color="primary" onClick={handleSearchClick}>
+                        <Search />
+                    </IconButton>
+                    <IconButton color="primary" onClick={handleClearClick}>
+                        <Clear />
+                    </IconButton>
+                </Box>
+                <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle1">Filter by Location</Typography>
                     {locations.map((loc) => (
                         <FormControlLabel
                             key={loc}
@@ -155,7 +146,7 @@ function Facilities() {
                     ))}
                 </Box>
                 <Box>
-                    <Typography variant="subtitle1">Filters by Facility</Typography>
+                    <Typography variant="subtitle1">Filter by Facility Type</Typography>
                     {facilityTypes.map((type) => (
                         <FormControlLabel
                             key={type}
@@ -166,48 +157,84 @@ function Facilities() {
                 </Box>
             </Box>
 
-            <Grid container spacing={2}>
-                {
-                    facilityList.map((facilities, i) => {
-                        return (
-                            <Grid item xs={12} md={6} lg={4} key={facilities.id}>
-                                <Card>
-                                    {
-                                        facilities.imageFile && (
-                                            <Box className="aspect-ratio-container">
-                                                <img alt="facility"
-                                                    src={`${import.meta.env.VITE_FILE_BASE_URL}${facilities.imageFile}`}>
-                                                </img>
-                                            </Box>
-                                        )
-                                    }
-                                    <CardContent>
-                                        <Box sx={{ display: 'flex', mb: 1 }}>
-                                            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                                                {facilities.name}
-                                            </Typography>
+            {/* Right Content Area for Facility List */}
+            <Box sx={{ flexGrow: 1, p: 2 }}>
+                <Typography variant="h5" sx={{ mb: 2 }}>
+                    Facilities
+                </Typography>
+                <Grid container spacing={2}>
+                    {filteredList.map((facility) => (
+                        <Grid item xs={12} md={6} lg={4} key={facility.id}>
+                            <Card>
+                                {facility.imageFile && (
+                                    <Box className="aspect-ratio-container">
+                                        <img alt="facility"
+                                            src={`${import.meta.env.VITE_FILE_BASE_URL}${facility.imageFile}`}
+                                            style={{ width: '100%' }} />
+                                    </Box>
+                                )}
+                                <CardContent>
+                                    
+                                    
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                        <Button variant="outlined" color="primary"
+                                            onClick={() => handleViewDetails(facility)}>
+                                            View Details
+                                        </Button>
+                                        <Button variant="contained" color="secondary">
+                                            Check Availability
+                                        </Button>
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
 
-                                        </Box>
-
-
-                                        <Typography sx={{ whiteSpace: 'pre-wrap' }}>
-                                            {facilities.description}
-                                        </Typography>
-                                        <Typography sx={{ mt: 1, fontWeight: 'bold' }}>
-                                            Location: {facilities.location}
-                                        </Typography>
-                                        <Typography sx={{ fontWeight: 'bold' }}>
-                                            Facility Type: {facilities.facilityType}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        );
-                    })
-                }
-            </Grid>
+            {/* Modal for Facility Details */}
+            <Modal
+                open={!!selectedFacility}
+                onClose={handleCloseModal}
+                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+                <Box sx={{
+                    backgroundColor: 'white', p: 4, width: 500, maxWidth: '100%',
+                    boxShadow: 24, borderRadius: 2, position: 'relative'
+                }}>
+                    <IconButton
+                        sx={{ position: 'absolute', top: 8, right: 8 }}
+                        onClick={handleCloseModal}
+                    >
+                        <Close />
+                    </IconButton>
+                    {selectedFacility && (
+                        <>
+                            <Typography variant="h4" sx={{ mb: 2 }}>
+                                {selectedFacility.name}
+                            </Typography>
+                            {selectedFacility.imageFile && (
+                                <Box className="aspect-ratio-container" sx={{ mb: 2 }}>
+                                    <img alt="facility"
+                                        src={`${import.meta.env.VITE_FILE_BASE_URL}${selectedFacility.imageFile}`}
+                                        style={{ width: '100%' }} />
+                                </Box>
+                            )}
+                            <Typography sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>
+                                {selectedFacility.description}
+                            </Typography>
+                            <Typography sx={{ fontWeight: 'bold', mb: 1 }}>
+                                Location: {selectedFacility.location}
+                            </Typography>
+                            <Typography sx={{ fontWeight: 'bold', mb: 1 }}>
+                                Facility Type: {selectedFacility.facilityType}
+                            </Typography>
+                        </>
+                    )}
+                </Box>
+            </Modal>
         </Box>
     );
 }
 
-export default Facilities;
+export default UserFacilities;

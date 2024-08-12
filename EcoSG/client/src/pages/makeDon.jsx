@@ -23,6 +23,7 @@ function Makedon() {
     };
     // const { user } = useContext(UserContext);
     // const { user, setUser } = useContext(UserContext);
+
     const formik = useFormik({
         initialValues: {
             amount: id,
@@ -37,6 +38,7 @@ function Makedon() {
                 .max(500, 'Description must be at most 500 characters')
                 .required('Description is required')
         }),
+        
 
         onSubmit: (data) => {
             amt = data.amount.trim()
@@ -52,7 +54,6 @@ function Makedon() {
             http.post("/tutorial", data)
                 .then((res) => {
                     console.log(res.data);
-                    // // setUser({...user, donations: [...user.donations, data.amount] });
                     navigate(`/checkout/${amt}`);
                 });
         }

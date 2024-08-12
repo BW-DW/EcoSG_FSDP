@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, TextField, Button, Grid} from '@mui/material';
+import { Box, Typography, TextField, Button, Grid, Divider } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import http from '../http';
@@ -21,7 +21,7 @@ function ContactUs() {
       name: yup.string().trim().required('Name is required'),
       email: yup.string().trim().email('Invalid email').required('Email is required'),
       message: yup.string().trim().required('Message is required'),
-    }), 
+    }),
     onSubmit: (data) => {
       try {
         data.name = data.name.trim();
@@ -51,16 +51,19 @@ function ContactUs() {
   });
 
   return (
-    <Box>
-      <Typography variant="h5" sx={{ my: 2 }}>
+    <Box sx={{ bgcolor: '#e8eae6', p: 4, maxWidth: '800px', margin: 'auto', borderRadius: '8px' }}>
+      <Typography variant="h4" sx={{ textAlign: 'center', mb: 4 }}>
         Contact Us
       </Typography>
-      <Box component="form" onSubmit={formik.handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={6}>
+          <Typography variant="h5" sx={{ mb: 2 }}>
+            Leave us a message
+          </Typography>
+          <Box component="form" onSubmit={formik.handleSubmit}>
             <TextField
               fullWidth
-              margin="dense"
+              margin="normal"
               autoComplete="off"
               label="Name"
               name="name"
@@ -70,11 +73,9 @@ function ContactUs() {
               error={formik.touched.name && Boolean(formik.errors.name)}
               helperText={formik.touched.name && formik.errors.name}
             />
-          </Grid>
-          <Grid item xs={12}>
             <TextField
               fullWidth
-              margin="dense"
+              margin="normal"
               autoComplete="off"
               label="Email"
               name="email"
@@ -84,11 +85,9 @@ function ContactUs() {
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
             />
-          </Grid>
-          <Grid item xs={12}>
             <TextField
               fullWidth
-              margin="dense"
+              margin="normal"
               autoComplete="off"
               multiline
               minRows={4}
@@ -100,15 +99,29 @@ function ContactUs() {
               error={formik.touched.message && Boolean(formik.errors.message)}
               helperText={formik.touched.message && formik.errors.message}
             />
-          </Grid>
+            <Button variant="contained" type="submit" disabled={sending} sx={{ mt: 2 }}>
+              {sending ? 'Sending...' : 'Submit'}
+            </Button>
+          </Box>
         </Grid>
-        <Box sx={{ mt: 2 }}>
-          <Button variant="contained" type="submit" disabled={sending}>
-            {sending? 'Sending...' : 'Send Message'}
-          </Button>
-        </Box>
-      </Box>
 
+        <Divider orientation="vertical" flexItem />
+
+        <Grid item xs={12} md={5}>
+          <Typography variant="h5" sx={{ mb: 2 }}>
+            Contact details
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            Person-in-charge: John Little
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            Contact number: 94729421
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            Email: littlejohnloveskids@gmail.com
+          </Typography>
+        </Grid>
+      </Grid>
       <ToastContainer />
     </Box>
   );

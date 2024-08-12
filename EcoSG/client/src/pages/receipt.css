@@ -5,6 +5,23 @@
     transition: transform 0.3s ease-in-out;
     display: inline-block; /* add this to ensure icon is visible */
   }
+
+  #cross-icon {
+    /* Make the cross icon visible and styled */
+    display: inline-block;
+    font-size: 24px; /* adjust the size of the cross icon */
+    color: #FF0000; /* red color for the cross icon */
+    cursor: pointer; /* change the cursor to a pointer on hover */
+  }
+  
+  #cross-icon.active {
+    /* Add styles for the active state */
+    transform: rotate(45deg); /* rotate the cross icon 45 degrees */
+    background-color: #FFFFFF; /* add a white background to the cross icon */
+    border-radius: 50%; /* add a circular border radius */
+    padding: 10px; /* add some padding around the cross icon */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* add a subtle box shadow */
+  }
   
   #tick-icon.active {
     transform: scale(1);

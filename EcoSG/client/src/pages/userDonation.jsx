@@ -25,43 +25,18 @@ import UserContext from '../contexts/UserContext';
 import EditDialog from '../components/EditDialog';
 
 function UserDonation() {
-    let tutorialAmounts={}
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [filter, setFilter] = useState('');
     const [order, setOrder] = useState('ascending');
     const [search, setSearch] = useState('');
-    const { user } = useContext(UserContext);
+    // const { user } = useContext(UserContext);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [fieldToEdit, setFieldToEdit] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
-    const [tutorialList, setTutorialList] = useState([]);
 
-    const getTutorials = () => {
-        http.get('/tutorial').then((res) => {
-            setTutorialList(res.data);
-        });
-    };
-
-    const calculateTutorialAmounts = () => {
-        let tutorialAmounts = {};
-      
-        users.forEach((user) => {
-          let userTutorials = tutorialList.filter((tutorial) => tutorial.userId === user.id);
-          let totalAmount = userTutorials.reduce((acc, tutorial) => acc + tutorial.amount, 0);
-          tutorialAmounts[user.id] = totalAmount;
-        });
-      
-        return tutorialAmounts;
-      };
-
-      useEffect(() => {
-        getTutorials();
-        tutorialAmounts=calculateTutorialAmounts();
-    }, []);
-    tutorialAmounts=calculateTutorialAmounts();
     // Function to fetch users based on search, filter, and order
     const fetchUsers = async () => {
         try {
@@ -82,6 +57,32 @@ function UserDonation() {
     useEffect(() => {
         fetchUsers();
     }, [search, filter, order]);
+
+    const [tutorialList, setTutorialList] = useState([]);
+    const getTutorials = () => {
+        http.get('/tutorial').then((res) => {
+            setTutorialList(res.data);
+        });
+    };
+
+    useEffect(() => {
+        getTutorials();
+    }, []);
+
+
+    const calculateTutorialAmounts = () => {
+        const tutorialAmounts = {};
+      
+        users.forEach((user) => {
+          const userTutorials = tutorialList.filter((tutorial) => tutorial.userId === user.id);
+          const totalAmount = userTutorials.reduce((acc, tutorial) => acc + tutorial.amount, 0);
+          tutorialAmounts[user.id] = totalAmount;
+        });
+      
+        return tutorialAmounts;
+      };
+
+      let tutorialAmounts=calculateTutorialAmounts()
 
     // Handle search input changes
     const handleSearchChange = (e) => {

@@ -49,50 +49,98 @@ function Donations() {
     };
 
     return (
-        <Box>
-            <Typography variant="h5" sx={{ my: 2 }}>
-                View Donations
-            </Typography>
+//         <Box>
+//             <Typography variant="h5" sx={{ my: 2 }}>
+//                 Make a Donation
+//             </Typography>
             
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Input value={search} placeholder="Search"
-                    onChange={onSearchChange}
-                    onKeyDown={onSearchKeyDown} />
-                <IconButton color="primary"
-                    onClick={onClickSearch}>
-                    <Search />
-                </IconButton>
-                <IconButton color="primary"
-                    onClick={onClickClear}>
-                    <Clear />
-                </IconButton>
-                <Box sx={{ flexGrow: 1 }} />
-                {
-                    user && (
-                        <Link to="/makedonations" style={{ textDecoration: 'none' }}>
-                            <Button variant='contained'>
-                                Donate
-                            </Button>
-                        </Link>
-                    )
-                }
-            </Box>
-            <div className="button-grid">
-            <Link to="/makedonations/10">
-      <button className="button">$10</button></Link>
-      <Link to="/makedonations/20">
-      <button className="button">$20</button></Link>
-      <Link to="/makedonations/50">
-      <button className="button">$50</button></Link>
-      <Link to="/makedonations/100">
-      <button className="button">$100</button></Link>
-      <Link to="/makedonations/150">
-      <button className="button">$150</button></Link>
-      <Link to="/makedonations/200">
-      <button className="button">$200</button></Link>
-    </div>
-        </Box>
-    );
+//             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+//                 <Input value={search} placeholder="Search"
+//                     onChange={onSearchChange}
+//                     onKeyDown={onSearchKeyDown} />
+//                 <IconButton color="primary"
+//                     onClick={onClickSearch}>
+//                     <Search />
+//                 </IconButton>
+//                 <IconButton color="primary"
+//                     onClick={onClickClear}>
+//                     <Clear />
+//                 </IconButton>
+//                 <Box sx={{ flexGrow: 1 }} />
+//                 {
+//                     user && (
+//                         <Link to="/makedonations" style={{ textDecoration: 'none' }}>
+//                             <Button variant='contained'>
+//                                 Donate
+//                             </Button>
+//                         </Link>
+//                     )
+//                 }
+//             </Box>
+//             <div className="button-grid">
+//             <Link to="/makedonations/10">
+//       <button className="button">$10</button></Link>
+//       <Link to="/makedonations/20">
+//       <button className="button">$20</button></Link>
+//       <Link to="/makedonations/50">
+//       <button className="button">$50</button></Link>
+//       <Link to="/makedonations/100">
+//       <button className="button">$100</button></Link>
+//       <Link to="/makedonations/150">
+//       <button className="button">$150</button></Link>
+//       <Link to="/makedonations/200">
+//       <button className="button">$200</button></Link>
+//     </div>
+//         </Box>
+//     );
+// }
+
+// export default Donations;
+
+    <Box>
+      <Typography variant="h5" sx={{ my: 2 }}>
+        Make a Donation
+      </Typography>
+      
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ flexGrow: 1 }} />
+        {
+          user && (
+            <Link to="/makedonations" style={{ textDecoration: 'none' }}>
+              <Button variant='contained'>
+                Donate
+              </Button>
+            </Link>
+          )
+        }
+      </Box>
+
+      <Typography variant="body1" sx={{ mb: 4, textAlign: 'center' }}>
+        Your donation will help us to continue providing high-quality tutorials and resources to our community. Thank you for your support!
+      </Typography>
+
+      <div className="button-grid">
+        <Link to="/makedonations/10">
+          <button className="button big-button">$10</button>
+        </Link>
+        <Link to="/makedonations/20">
+          <button className="button big-button">$20</button>
+        </Link>
+        <Link to="/makedonations/50">
+          <button className="button big-button">$50</button>
+        </Link>
+        <Link to="/makedonations/100">
+          <button className="button big-button">$100</button>
+        </Link>
+        <Link to="/makedonations/150">
+          <button className="button big-button">$150</button>
+        </Link>
+        <Link to="/makedonations/200">
+          <button className="button big-button">$200</button>
+        </Link>
+      </div>
+    </Box>
+  );
 }
 
 export default Donations;

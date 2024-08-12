@@ -17,14 +17,17 @@
     "@mui/icons-material": "^5.15.14",
     "@mui/material": "^5.15.14",
     "@mui/x-date-pickers": "^7.1.0",
+    "@stripe/stripe-js": "^4.2.0",
     "axios": "^1.6.8",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.10",
     "formik": "^2.4.5",
+    "nodemailer": "^6.9.14",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "react-toastify": "^10.0.5",
+    "stripe": "^16.7.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

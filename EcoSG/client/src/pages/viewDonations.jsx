@@ -6,6 +6,7 @@ import http from '../http';
 import dayjs from 'dayjs';
 import UserContext from '../contexts/UserContext';
 import global from '../global';
+import './viewDon.css';
 
 function Viewdon() {
     let amt=0
@@ -13,61 +14,40 @@ function Viewdon() {
     const [search, setSearch] = useState('');
     const { user } = useContext(UserContext);
 
-    const updateDonation = async (userId, donationAmount) => {
-        try {
-          const response = await http.put(`/user/${userId}`, {
-            name: user.name,
-            donation: donationAmount
-          });
-          console.log(response.data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-    
-
 
     const onSearchChange = (e) => {
         setSearch(e.target.value);
     };
-
     const getTutorials = () => {
-        http.get(`/tutorial/userId/${user?.id}`).then((res) => {
+        http.get(`/tutorial`).then((res) => {
             setTutorialList(res.data);
         });
     };
-
     const searchTutorials = () => {
-        http.get(`/tutorial/userId/${user?.id}?search=${search}`).then((res) => {
+        http.get(`/tutorial?search=${search}`).then((res) => {
             setTutorialList(res.data);
         });
     };
-
     useEffect(() => {
         getTutorials();
     }, []);
-
     const onSearchKeyDown = (e) => {
         if (e.key === "Enter") {
             searchTutorials();
         }
     };
-
     const onClickSearch = () => {
         searchTutorials();
     }
-
     const onClickClear = () => {
         setSearch('');
         getTutorials();
     };
-
     return (
         <Box>
             <Typography variant="h5" sx={{ my: 2 }}>
                 View Donations
             </Typography>
-
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Input value={search} placeholder="Search"
                     onChange={onSearchChange}
@@ -93,10 +73,13 @@ function Viewdon() {
             </Box>
             <Grid container spacing={2}>
                 {
-                    tutorialList.slice().reverse().map((tutorial, i) => {
+                    tutorialList.map((tutorial, i) => {
                         return (
-                            <Grid item xs={12} md={6} lg={4} key={tutorial.id}>
+                            
+                                user && user.id === tutorial.userId && (
+                                    <Grid item xs={12} md={6} lg={4} key={tutorial.id}>
                                 {
+                                    
                                 <Card>
                                     <Typography sx={{ color: 'white' }}>
                                 {amt+=tutorial.amount}
@@ -107,13 +90,12 @@ function Viewdon() {
                                                 {tutorial.amount}
                                             </Typography>
                                             {
-                                                user && user.id === tutorial.userId && (
                                                     <Link to={`/updatedonations/${tutorial.id}`}>
                                                         <IconButton color="primary" sx={{ padding: '4px' }}>
                                                             <Edit />
                                                         </IconButton>
                                                     </Link>
-                                                )
+                                                
                                             }
                                         </Box>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}
@@ -137,7 +119,7 @@ function Viewdon() {
                                 </Card>
                                 }
                             </Grid>
-                        );
+                        ));
                     })
                 }
                 </Grid>
@@ -153,5 +135,4 @@ function Viewdon() {
         </Box>
     );
 }
-
 export default Viewdon;
