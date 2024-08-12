@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
+const { sign } = require('jsonwebtoken');
 const stripe = require('stripe')('sk_test_51PmZlSP9QuT2EU6lfXz7PROt8P7JYXlPwF34QC9aGaK4Gdv1WDkRLOFQSVFUQ1Qdo52D4QLFVodwQfbRqVnZbeWJ00Rar9CrVP');
 
 app.use(express.json());
@@ -30,5 +31,27 @@ router.post("/create_checkout_session",async(req,res)=>{
 
   res.json({id:session.id})
 });
+
+
+// router.post("/changeUser", async (req, res) => {
+//   let user = req.body;
+
+//       // Return user info
+//       let userInfo = {
+//           id: user.id,
+//           email: user.email,
+//           name: user.name,
+//           dob: user.dob, // include dob 
+//           role: user.role // and roles in response
+//       };
+//       let accessToken = sign(userInfo, process.env.APP_SECRET,
+//           { expiresIn: process.env.TOKEN_EXPIRES_IN });
+//       res.json({
+//           accessToken: accessToken,
+//           user: userInfo
+//       });
+//   }
+// );
+
 
 module.exports = router;

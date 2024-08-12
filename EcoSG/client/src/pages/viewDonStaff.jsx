@@ -88,7 +88,7 @@ function Viewdonstaff() {
                 </IconButton>
                 <Box sx={{ flexGrow: 1 }} />
                 {
-                        <Link to={`/makedonationstaff/${id}`} style={{ textDecoration: 'none' }}>
+                        <Link to={`/logindon`} style={{ textDecoration: 'none' }}>
                             <Button variant='contained'>
                                 Donate
                             </Button>
@@ -113,7 +113,7 @@ function Viewdonstaff() {
                                                 {tutorial.amount}
                                             </Typography>
                                             {
-                                                    <Link to={`/updatedonations/${tutorial.id}`}>
+                                                    <Link to={`/logindonupdate/${tutorial.id}`}>
                                                         <IconButton color="primary" sx={{ padding: '4px' }}>
                                                             <Edit />
                                                         </IconButton>
@@ -150,7 +150,7 @@ function Viewdonstaff() {
                                     Total Donations Made: ${amt}
                                 </Typography>
                                 <Typography variant="h5" sx={{ my: 2 }}>
-                                    Make a donation <Link to="/makeDonations">here</Link>
+                                    Make a donation <Link to="/logindon">here</Link>
                                 </Typography>
         </Box>
     );

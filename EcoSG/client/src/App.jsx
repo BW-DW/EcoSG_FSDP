@@ -11,6 +11,10 @@ import CreateEvent from './pages/CreateEvent';
 import MyForm from './pages/MyForm';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import LoginDon from './pages/LoginDon';
+import LoginOut from './pages/LoginOut';
+import LoginDonUpdate from './pages/LoginDonUpdate';
+import LoginOutUpdate from './pages/LoginOutUpdate';
 import AccountSettings from './pages/AccountSettings';
 import AccountDeleted from './pages/AccountDeleted';
 import UserTable from './pages/UserTable';
@@ -39,6 +43,7 @@ import Makedon from './pages/makeDon';
 import Makedonstaff from './pages/makeDonStaff.jsx';
 import Viewdon from './pages/viewDonations';
 import Updatedon from './pages/updateDonations';
+import UpdateDonStaff from './pages/UpdateDonStaff';
 import Checkout from './pages/checkout';
 import ReceiptPage from './pages/receipt';
 import ReceiptCancel from './pages/receiptcancel';
@@ -297,6 +302,10 @@ function App() {
               <Route path="/createevent" element={<CreateEvent />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/logindon" element={<LoginDon />} />
+              <Route path="/loginout/:id" element={<LoginOut />} />
+              <Route path="/logindonupdate/:id" element={<LoginDonUpdate />} />
+              <Route path="/loginoutupdate" element={<LoginOutUpdate />} />
               <Route path="/account" element={<AccountSettings />} />
               <Route path="/accountdeleted" element={<AccountDeleted />} />
               <Route path="/form" element={<MyForm />} />
@@ -304,9 +313,11 @@ function App() {
               <Route path="/makedonations" element={<Makedon />} />
               <Route path="/makedonations/:id" element={<Makedon />} />
               <Route path="/makedonationstaff/:id" element={<Makedonstaff />} />
+              <Route path="/makedonationstaff" element={<Makedonstaff />} />
               <Route path="/viewdonations" element={<Viewdon />} />
               <Route path="/viewdonation/:id" element={<Viewdonstaff />} />
               <Route path="/updatedonations/:id" element={<Updatedon />} />
+              <Route path="/updatedonationstaff/:id" element={<UpdateDonStaff />} />
               <Route path="/checkout/:id" element={<Checkout />} />
               <Route path="/receipt" element={<ReceiptPage />} />
               <Route path="/cancel" element={<ReceiptCancel />} />

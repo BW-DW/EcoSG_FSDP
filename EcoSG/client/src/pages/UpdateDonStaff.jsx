@@ -6,7 +6,7 @@ import http from '../http';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-function Updatedon() {
+function UpdateDonStaff() {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -41,7 +41,7 @@ function Updatedon() {
             http.put(`/tutorial/${id}`, data)
                 .then((res) => {
                     console.log(res.data);
-                    navigate("/viewdonations");
+                    navigate("/loginoutupdate");
                 });
         }
     });
@@ -60,7 +60,7 @@ function Updatedon() {
         http.delete(`/tutorial/${id}`)
             .then((res) => {
                 console.log(res.data);
-                navigate("/viewdonations");
+                navigate("/loginoutupdate");
             });
     }
 
@@ -130,4 +130,4 @@ function Updatedon() {
     );
 }
 
-export default Updatedon;
+export default UpdateDonStaff;

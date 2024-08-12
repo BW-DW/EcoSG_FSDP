@@ -7,12 +7,23 @@ import http from '../http';
 import axios from 'axios';
 import UserContext from '../contexts/UserContext';
 
-function Makedonstaff() {
+function MakedonStaff() {
     var amt = "";
     const { id } = useParams();
+    // const { user } = useContext(UserContext);
     const navigate = useNavigate();
+    const updateUserAmount = (userId, newAmount) => {
+        axios.put(`user/${userId}`, { name: "hello", amount: newAmount })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    };
     // const { user } = useContext(UserContext);
     // const { user, setUser } = useContext(UserContext);
+
     const formik = useFormik({
         initialValues: {
             amount: "",
@@ -20,25 +31,43 @@ function Makedonstaff() {
         },
         validationSchema: yup.object({
             amount: yup.string().trim()
-            .matches(/^[0-9\b]+$/, 'Amount must be in numbers only')
+                .matches(/^[0-9\b]+$/, 'Amount must be in numbers only')
                 .required('Amount is required'),
             description: yup.string().trim()
                 .min(3, 'Description must be at least 3 characters')
                 .max(500, 'Description must be at most 500 characters')
                 .required('Description is required')
         }),
+        
+
         onSubmit: (data) => {
             amt = data.amount.trim()
             data.amount = parseInt(data.amount.trim());
             data.description = data.description.trim();
-            data.userId = parseInt(id)
+            // http.put(`user/${id}`, { donation: newAmount })
+            //     .then(response => {
+            //         console.log(response.data);
+            //     })
+            //     .catch(error => {
+            //         console.error(error);
+            //     });
             http.post("/tutorial", data)
                 .then((res) => {
                     console.log(res.data);
-                    // // setUser({...user, donations: [...user.donations, data.amount] });
-                    navigate(`/checkout/${amt}`);
+                    navigate(`/loginout/${amt}`);
                 });
         }
+        // onSubmit: (data) => {
+        //     data.amount = parseInt(data.amount.trim());
+        //     data.description = data.description.trim();
+        //     const userId = user.id; // replace with the actual user id
+        //     updateUserAmount(userId, 0 + data.amount);
+        //     axios.post("/tutorials", data)
+        //       .then((res) => {
+        //         console.log(res.data);
+        //         navigate(`/checkout/${data.amount}`);
+        //       });
+        //   }
     });
     return (
         <Box>
@@ -77,4 +106,4 @@ function Makedonstaff() {
     );
 }
 
-export default Makedonstaff;
+export default MakedonStaff;
