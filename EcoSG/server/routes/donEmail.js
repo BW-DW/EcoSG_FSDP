@@ -8,14 +8,14 @@ var transporter = nodemailer.createTransport({
   port:465,
   secure:true,
   auth: {
-    user: 'fsdpy2sem1@gmail.com',
-    pass: 'cuku wrzy uqtb rlrz',
+    user: 'EcoSGGov@gmail.com',
+    pass: 'zixu hiqy fpza jjci',
   },
 });
 
 const sendEmail = async (email) =>{
   var mailOptions = {
-    from: 'fsdpy2sem1@gmail.com',
+    from: 'EcoSGGov@gmail.com',
     to: email,
     subject: 'Thanks',
     text: `Thank you for your donation`,
