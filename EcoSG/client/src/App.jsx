@@ -28,7 +28,6 @@ import EditEvent from './pages/EditEvent';
 import EventDetails from './pages/EventDetails';
 import AdminEvents from './pages/AdminEvents';
 import AdminEventDetails from './pages/AdminEventDetails';
-import CompletedEvents from './pages/CompletedEvents';
 import http from './http';
 import UserContext from './contexts/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -49,6 +48,8 @@ import ReceiptPage from './pages/receipt';
 import ReceiptCancel from './pages/receiptcancel';
 import UserDonation from './pages/userDonation';
 import Viewdonstaff from './pages/viewDonStaff';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgetPassword from './pages/ForgetPassword';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -117,7 +118,11 @@ function App() {
           <AppBar position="static" className="AppBar">
             <Container>
               <Toolbar disableGutters={true}>
-                <Link to="/"><Typography variant="h6" component="div">EcoSG</Typography></Link>
+                <Link to="/"><img
+                  alt="EcoSG"
+                  src={`${import.meta.env.VITE_FILE_BASE_URL}EcoSG.png`}
+                  style={{ height: '70px', marginTop: '8px' }}
+                /></Link>
                 <Link to="/rewards"><Typography>Rewards</Typography></Link>
                 <Link to="/announcements"><Typography>Announcements</Typography></Link>
                 {user && user.role === 'staff' && (
@@ -251,11 +256,6 @@ function App() {
                       Create Event
                     </Link>
                   </MenuItem>
-                  <MenuItem onClick={handleEventsMenuClose}>
-                    <Link to="/completedevents" style={{ textDecoration: 'none', color: 'inherit' }}>
-                      Completed Events
-                    </Link>
-                  </MenuItem>
                   {user && (
                     <MenuItem onClick={handleEventsMenuClose}>
                       <Link to="/admin/events" style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -306,7 +306,9 @@ function App() {
               <Route path="/loginout/:id" element={<LoginOut />} />
               <Route path="/logindonupdate/:id" element={<LoginDonUpdate />} />
               <Route path="/loginoutupdate" element={<LoginOutUpdate />} />
+              <Route path="/forgetpassword" element={<ForgetPassword />} />
               <Route path="/account" element={<AccountSettings />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/accountdeleted" element={<AccountDeleted />} />
               <Route path="/form" element={<MyForm />} />
               <Route path="/donations" element={<Donations />} />
@@ -348,7 +350,44 @@ function App() {
               <Route path="/editevent/:id" element={<EditEvent />} />
               <Route path="/admin/events" element={<AdminEvents />} />
               <Route path="/admin/event/:id" element={<AdminEventDetails />} />
-              <Route path="/completedevents" element={<CompletedEvents />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/form" element={<MyForm />} />
+              <Route path="/donations" element={<Donations />} />
+              <Route path="/makedonations" element={<Makedon />} />
+              <Route path="/makedonations/:id" element={<Makedon />} />
+              <Route path="/viewdonations" element={<Viewdon />} />
+              <Route path="/viewdonation/:id" element={<Viewdonstaff />} />
+              <Route path="/updatedonations/:id" element={<Updatedon />} />
+              <Route path="/checkout/:id" element={<Checkout />} />
+              <Route path="/receipt/:id" element={<ReceiptPage />} />
+              <Route path="/users" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserTable />
+                </ProtectedRoute>}
+              />
+              <Route path="/users/edit/:id" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserTableEdit />
+                </ProtectedRoute>} />
+              <Route path="/addannouncement" element={<AddAnnouncement />} />
+              <Route path="/editannouncement/:id" element={<EditAnnouncement />} />
+              <Route path="/announcements" element={<Announcements />} />
+              <Route path="/createfacilities" element={<CreateFacilities />} />
+              <Route path="/editfacilities/:id" element={<EditFacilities />} />
+              <Route path="/facilities" element={<Facilities />} />
+              <Route path="/contactus" element={<ContactUs />} />
+              <Route path="/contactmessages" element={<ContactMessages />} />
+              <Route path="/userfacilities" element={<UserFacilities />} />
+              <Route path="/userdonations" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserDonation />
+                </ProtectedRoute>}
+              />
+              <Route path="/event/:id" element={<EventDetails />} />
+              <Route path="/editevent/:id" element={<EditEvent />} />
+              <Route path="/admin/events" element={<AdminEvents />} />
+              <Route path="/admin/event/:id" element={<AdminEventDetails />} />
             </Routes>
           </Container>
         </ThemeProvider>

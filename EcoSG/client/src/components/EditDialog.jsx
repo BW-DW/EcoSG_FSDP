@@ -7,9 +7,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+import http from '../http';
 
-function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
+function EditDialog({ open, handleClose, field, handleSave, initialValue, userId }) {
   const [errorMessage, setErrorMessage] = useState('');
+  const [oldDataSaved, setOldDataSaved] = useState(false);
 
   const validationSchema = yup.object({
     currentPassword: field === 'password'
@@ -46,11 +48,24 @@ function EditDialog({ open, handleClose, field, handleSave, initialValue }) {
   });
 
   useEffect(() => {
-    if (open) {
+    if (open && userId) {
+      // Save old data when the dialog opens
+      http.post('/save-old-data', { userId })
+        .then((response) => {
+          if (response.data.success) {
+            setOldDataSaved(true);
+          } else {
+            setErrorMessage('Failed to save old data');
+          }
+        })
+        .catch((error) => {
+          setErrorMessage('Error saving old data');
+        });
+
       formik.resetForm();
       setErrorMessage('');
     }
-  }, [open]);
+  }, [open, userId]);
 
   return (
     <Dialog open={open} onClose={handleClose}>

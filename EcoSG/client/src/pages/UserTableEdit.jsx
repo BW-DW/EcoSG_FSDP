@@ -9,7 +9,9 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import http from '../http';
 import { useFormik } from 'formik';
@@ -30,11 +32,12 @@ function UserTableEdit() {
       name: '',
       email: '',
       dob: '',
+      verified: false, // Add the verified field
     },
     validationSchema: yup.object({
       name: yup.string().trim().min(3).max(50).required("Name is required"),
       email: yup.string().trim().lowercase().email().max(50).required("Email is required"),
-      dob: yup.date().nullable().required('Date of Birth is required').max(new Date(), 'Date of Birth cannot be in the future'),
+      // dob: yup.date().nullable().required('Date of Birth is required').max(new Date(), 'Date of Birth cannot be in the future'),
     }),
     onSubmit: async (data) => {
       try {
@@ -43,7 +46,8 @@ function UserTableEdit() {
         const updateData = {
           name: data.name,
           email: data.email,
-          dob: data.dob,
+          verified: data.verified, // Include the verified field in the update data
+          // dob: data.dob,
         };
 
         await http.put(`/user/${id}`, updateData);
@@ -136,7 +140,7 @@ function UserTableEdit() {
           error={(formik.touched.email && Boolean(formik.errors.email)) || Boolean(errorMessages.email)}
           helperText={(formik.touched.email && formik.errors.email) || errorMessages.email}
         />
-        <TextField
+        {/* <TextField
           fullWidth
           margin="dense"
           label="Date of Birth"
@@ -150,6 +154,16 @@ function UserTableEdit() {
           InputLabelProps={{
             shrink: true,
           }}
+        /> */}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={formik.values.verified}
+              onChange={(event) => formik.setFieldValue('verified', event.target.checked)}
+              color="primary"
+            />
+          }
+          label="Verified"
         />
         <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
           <Button variant="contained" type="submit">

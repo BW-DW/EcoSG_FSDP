@@ -114,7 +114,7 @@ function UserTable() {
                         value={filter}
                         onChange={handleFilterChange}
                         displayEmpty
-                        renderValue={(value) => value === '' ? 'All' : value}
+                        renderValue={(value) => (value === '' ? 'All' : value)}
                         sx={{ ml: 2 }}
                     >
                         <MenuItem value="">All</MenuItem>
@@ -131,41 +131,35 @@ function UserTable() {
                         <TableCell>Email</TableCell>
                         <TableCell>Date of Birth</TableCell>
                         <TableCell>Role</TableCell>
-                        <TableCell>Donations Made</TableCell>
+                        <TableCell>Verified</TableCell>
                         <TableCell>Created</TableCell>
                         <TableCell>Last Updated</TableCell>
-                        {/* <TableCell>Points</TableCell>
-                        <TableCell>Hours</TableCell>
-                        <TableCell>Total Events</TableCell>
-                        <TableCell>Donate</TableCell> */}
                         <TableCell>Edit</TableCell>
                         <TableCell>Delete</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {users.map((user) => (
-                        <TableRow key={user.id}>
-                            <TableCell>{user.id}</TableCell>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.dob}</TableCell>
-                            <TableCell>{user.role}</TableCell>
-                            {/* <TableCell>{user.points}</TableCell>
-                            <TableCell>{user.hours}</TableCell>
-                            <TableCell>{user.totalEvents}</TableCell>
-                            <TableCell>{user.donate}</TableCell> */}
-                            <TableCell>{user.donation !== null ? user.donation : 'Null'}</TableCell>
-                            <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
-                            <TableCell>{new Date(user.updatedAt).toLocaleString()}</TableCell>
+                    {users.map((tableUser) => (
+                        <TableRow key={tableUser.id}>
+                            <TableCell>{tableUser.id}</TableCell>
+                            <TableCell>{tableUser.name}</TableCell>
+                            <TableCell>{tableUser.email}</TableCell>
+                            <TableCell>{tableUser.dob}</TableCell>
+                            <TableCell>{tableUser.role}</TableCell>
+                            <TableCell>{tableUser.verified ? 'Yes' : 'No'}</TableCell> {/* New Verified Column */}
+                            <TableCell>{new Date(tableUser.createdAt).toLocaleString()}</TableCell>
+                            <TableCell>{new Date(tableUser.updatedAt).toLocaleString()}</TableCell>
                             <TableCell>
-                                <IconButton onClick={() => navigate(`/users/edit/${user.id}`)}>
+                                <IconButton onClick={() => navigate(`/users/edit/${tableUser.id}`)}>
                                     <Edit />
                                 </IconButton>
                             </TableCell>
                             <TableCell>
-                                <IconButton onClick={() => { setConfirmDialogOpen(true); setUserToDelete(user); }}>
-                                    <Delete />
-                                </IconButton>
+                                {tableUser.id !== user.id && (
+                                    <IconButton onClick={() => { setConfirmDialogOpen(true); setUserToDelete(tableUser); }}>
+                                        <Delete />
+                                    </IconButton>
+                                )}
                             </TableCell>
                         </TableRow>
                     ))}
