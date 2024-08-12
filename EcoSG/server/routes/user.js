@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const { User, Reward } = require('../models');
 const { Op } = require("sequelize");
 const yup = require("yup");
@@ -50,51 +52,100 @@ router.post("/register", async (req, res) => {
     }
 });
 
+// Configure nodemailer transporter
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    auth: {
+        user: 'bwgyanimate@gmail.com',
+        pass: 'frqkodlqfpmpkmpd'
+    }
+});
+
+// Temporary data store (could be a database or in-memory store)
+const tempDataStore = new Map();
+
 router.post("/login", async (req, res) => {
     let data = req.body;
-    // Validate request body
     let validationSchema = yup.object({
         email: yup.string().trim().lowercase().email().max(50).required(),
         password: yup.string().trim().min(8).max(50).required()
     });
+
     try {
-        data = await validationSchema.validate(data,
-            { abortEarly: false });
+        data = await validationSchema.validate(data, { abortEarly: false });
 
         // Check email and password
         let errorMsg = "Email or password is not correct.";
-        let user = await User.findOne({
-            where: { email: data.email }
-        });
+        let user = await User.findOne({ where: { email: data.email } });
         if (!user) {
-            res.status(400).json({ message: errorMsg });
-            return;
+            return res.status(400).json({ message: errorMsg });
         }
         let match = await bcrypt.compare(data.password, user.password);
         if (!match) {
-            res.status(400).json({ message: errorMsg });
-            return;
+            return res.status(400).json({ message: errorMsg });
         }
 
-        // Return user info
-        let userInfo = {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            dob: user.dob, // include dob 
-            role: user.role // and roles in response
+        // Generate a 2FA code
+        const twoFACode = crypto.randomInt(100000, 999999).toString();
+
+        // Store user info and 2FA code temporarily
+        tempDataStore.set(user.email, { userInfo: user, twoFACode });
+
+        // Send the 2FA code via email
+        const mailOptions = {
+            from: 'bwgyanimate@gmail.com',
+            to: user.email,
+            subject: 'Your 2FA Code',
+            text: `Your 2FA verification code is: ${twoFACode}`,
+            html: `<p>Your 2FA verification code is: <strong>${twoFACode}</strong></p>`
         };
-        let accessToken = sign(userInfo, process.env.APP_SECRET,
-            { expiresIn: process.env.TOKEN_EXPIRES_IN });
-        res.json({
-            accessToken: accessToken,
-            user: userInfo
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending 2FA email:', error);
+                return res.status(500).json({ message: 'Error sending 2FA code. Please try again.' });
+            }
+            console.log('2FA email sent:', info.response);
         });
+
+        // Respond with a message indicating that 2FA is required
+        return res.status(200).json({
+            message: "A 2FA code has been sent to your email. Please verify to proceed.",
+            twoFANeeded: true,
+            email: user.email
+        });
+
+    } catch (err) {
+        return res.status(400).json({ errors: err.errors });
     }
-    catch (err) {
-        res.status(400).json({ errors: err.errors });
-        return;
+});
+
+// 2FA verification route
+router.post("/verify-2fa", async (req, res) => {
+    const { email, twoFACode } = req.body;
+
+    const tempData = tempDataStore.get(email);
+    if (!tempData || tempData.twoFACode !== twoFACode) {
+        return res.status(400).json({ message: "Invalid 2FA code." });
     }
+
+    const userInfo = {
+        id: tempData.userInfo.id,
+        email: tempData.userInfo.email,
+        name: tempData.userInfo.name,
+        dob: tempData.userInfo.dob,
+        role: tempData.userInfo.role
+    };
+    let accessToken = sign(userInfo, process.env.APP_SECRET, { expiresIn: process.env.TOKEN_EXPIRES_IN });
+
+    // Remove temporary data after successful login
+    tempDataStore.delete(email);
+
+    return res.json({
+        accessToken: accessToken,
+        user: userInfo
+    });
 });
 
 router.get("/auth", validateToken, (req, res) => {

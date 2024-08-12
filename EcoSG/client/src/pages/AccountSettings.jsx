@@ -114,9 +114,6 @@ const handleSave = async (newValue, currentPassword) => {
             </Typography>
             <Card sx={{ mb: 4, maxWidth: 600, width: '100%' }}>
                 <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                        <img src="/path/to/user/profile/pic" alt="Profile" style={{ borderRadius: '50%', width: '100px', height: '100px' }} />
-                    </Box>
                     <Typography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                         Hello, {user?.name}!
                     </Typography>

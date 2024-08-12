@@ -7,16 +7,18 @@ import http from '../http';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import UserContext from '../contexts/UserContext';
-import ReCAPTCHA from "react-google-recaptcha"; // Import reCAPTCHA
-
+import ReCAPTCHA from "react-google-recaptcha";
 
 function Login() {
     const navigate = useNavigate();
     const { setUser } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
-    const [showRecaptcha, setShowRecaptcha] = useState(false); // Track whether to show reCAPTCHA
-    const [recaptchaToken, setRecaptchaToken] = useState(""); // Store the reCAPTCHA token
-    const [incorrectAttempts, setIncorrectAttempts] = useState(0); // Track incorrect attempts
+    const [showRecaptcha, setShowRecaptcha] = useState(false);
+    const [recaptchaToken, setRecaptchaToken] = useState("");
+    const [incorrectAttempts, setIncorrectAttempts] = useState(0);
+    const [is2FARequired, setIs2FARequired] = useState(false);
+    const [twoFACode, setTwoFACode] = useState(""); // New state for 2FA code
+    const [email, setEmail] = useState(""); // Store email for 2FA submission
 
     const handleRecaptchaChange = (token) => {
         setRecaptchaToken(token);
@@ -47,20 +49,26 @@ function Login() {
         }),
         onSubmit: (data) => {
             setIsLoading(true);
-            data.recaptchaToken = recaptchaToken; // Add reCAPTCHA token to the form data
-            data.incorrectAttempts = incorrectAttempts; // Add incorrect attempts to the form data
+            data.recaptchaToken = recaptchaToken;
+            data.incorrectAttempts = incorrectAttempts;
+
             http.post("/user/login", data)
                 .then((res) => {
-                    localStorage.setItem("accessToken", res.data.accessToken);
-                    setUser(res.data.user);
-                    toast.success('Login successful!');
-
-                    notifyLogin(res.data.user.id);
-                    navigate("/");
+                    if (res.data.twoFANeeded) {
+                        setIs2FARequired(true);
+                        setEmail(data.email); // Store email for 2FA submission
+                        toast.info('2FA code sent to your email. Please enter the code.');
+                    } else {
+                        localStorage.setItem("accessToken", res.data.accessToken);
+                        setUser(res.data.user);
+                        toast.success('Login successful!');
+                        notifyLogin(res.data.user.id);
+                        navigate("/");
+                    }
                 })
                 .catch(function (err) {
                     setIncorrectAttempts(prev => prev + 1);
-                    if (incorrectAttempts >= 0) setShowRecaptcha(true); // Show reCAPTCHA after incorrect attempt
+                    if (incorrectAttempts >= 0) setShowRecaptcha(true);
                     const errorMessage = Array.isArray(err.response.data.message)
                         ? err.response.data.message.join(', ')
                         : err.response.data.message;
@@ -70,6 +78,22 @@ function Login() {
         }
     });
 
+    const handle2FASubmit = () => {
+        setIsLoading(true);
+        http.post("/user/verify-2fa", { email, twoFACode })
+            .then((res) => {
+                localStorage.setItem("accessToken", res.data.accessToken);
+                setUser(res.data.user);
+                toast.success('Login successful!');
+                notifyLogin(res.data.user.id);
+                navigate("/");
+            })
+            .catch(function (err) {
+                toast.error('Invalid 2FA code. Please try again.');
+            })
+            .finally(() => setIsLoading(false));
+    };
+
     return (
         <Box sx={{
             marginTop: 8,
@@ -78,54 +102,76 @@ function Login() {
             alignItems: 'center'
         }}>
             <Typography variant="h5" sx={{ my: 2 }}>
-                Login
+                {is2FARequired ? 'Enter 2FA Code' : 'Login'}
             </Typography>
-            <Box component="form" sx={{ maxWidth: '500px' }}
-                onSubmit={formik.handleSubmit}>
-                <TextField
-                    fullWidth margin="dense" autoComplete="off"
-                    label="Email"
-                    name="email"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                />
-                <TextField
-                    fullWidth margin="dense" autoComplete="off"
-                    label="Password"
-                    name="password" type="password"
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.password && Boolean(formik.errors.password)}
-                    helperText={formik.touched.password && formik.errors.password}
-                />
-                {showRecaptcha && (
-                    <ReCAPTCHA
-                        sitekey="6LfbKSQqAAAAAFXdxb9hN5dQYW_XkmmflREUQc_p" // CHANGE WHEN FREE
-                        onChange={handleRecaptchaChange}
+            {!is2FARequired ? (
+                <Box component="form" sx={{ maxWidth: '500px' }}
+                    onSubmit={formik.handleSubmit}>
+                    <TextField
+                        fullWidth margin="dense" autoComplete="off"
+                        label="Email"
+                        name="email"
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.email && Boolean(formik.errors.email)}
+                        helperText={formik.touched.email && formik.errors.email}
                     />
-                )}
-                <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 2 }}
-                    type="submit"
-                    disabled={isLoading || (showRecaptcha && !recaptchaToken)} // Disable button until reCAPTCHA is solved
-                >
-                    {isLoading ? 'Loading...' : 'Login'}
-                </Button>
-            </Box>
+                    <TextField
+                        fullWidth margin="dense" autoComplete="off"
+                        label="Password"
+                        name="password" type="password"
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        helperText={formik.touched.password && formik.errors.password}
+                    />
+                    {showRecaptcha && (
+                        <ReCAPTCHA
+                            sitekey="6LfbKSQqAAAAAFXdxb9hN5dQYW_XkmmflREUQc_p"
+                            onChange={handleRecaptchaChange}
+                        />
+                    )}
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 2 }}
+                        type="submit"
+                        disabled={isLoading || (showRecaptcha && !recaptchaToken)}
+                    >
+                        {isLoading ? 'Loading...' : 'Login'}
+                    </Button>
+                </Box>
+            ) : (
+                <Box sx={{ maxWidth: '500px' }}>
+                    <TextField
+                        fullWidth margin="dense" autoComplete="off"
+                        label="2FA Code"
+                        value={twoFACode}
+                        onChange={(e) => setTwoFACode(e.target.value)}
+                    />
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 2 }}
+                        onClick={handle2FASubmit}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Verifying...' : 'Verify 2FA'}
+                    </Button>
+                </Box>
+            )}
 
-            <Button
-                variant="text"
-                sx={{ mt: 2 }}
-                onClick={() => navigate("/forgetpassword")}
-            >
-                Forgot Password?
-            </Button>
+            {!is2FARequired && (
+                <Button
+                    variant="text"
+                    sx={{ mt: 2 }}
+                    onClick={() => navigate("/forgetpassword")}
+                >
+                    Forgot Password?
+                </Button>
+            )}
 
             <ToastContainer />
         </Box>
