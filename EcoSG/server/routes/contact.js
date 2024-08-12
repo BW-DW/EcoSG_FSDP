@@ -4,7 +4,9 @@ const { Contact } = require('../models');
 const { Op } = require("sequelize");
 const yup = require("yup");
 const { validateToken } = require('../middlewares/auth');
-
+const { saveContactMessage } = require('../models/contactService');
+const app = express();
+const { sendContactUsEmail } = require('../models/emailService');
 // Contact Us API
 router.post("/contactmessages", async (req, res) => {
   console.log("Received request body:", req.body);
@@ -20,11 +22,14 @@ router.post("/contactmessages", async (req, res) => {
     console.log("Validation successful:", data);
     let contactMessage = await Contact.create(data);
     console.log("Contact message created:", contactMessage);
+    await sendContactUsEmail(contactMessage.email, contactMessage.name);
+        console.log("Email notification sent to:", contactMessage.email);
     res.json(contactMessage);
   } catch (err) {
     console.error("Error occurred:", err);
     res.status(400).json({ errors: err.errors });
   }
+  app.post('/contact', saveContactMessage);
 });
 
 // Get all contact messages API
