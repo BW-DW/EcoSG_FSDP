@@ -9,10 +9,10 @@ import MyForm from './pages/MyForm';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Events from './pages/Events';
-import EditEvent from './pages/EditEvent';  // Ensure this import is present
-import EventDetails from './pages/EventDetails'; // Add this import
-import AdminEvents from './pages/AdminEvents'; // Add this import
-import AdminEventDetails from './pages/AdminEventDetails'; // Add this import
+import EditEvent from './pages/EditEvent';
+import EventDetails from './pages/EventDetails';
+import AdminEvents from './pages/AdminEvents';
+import AdminEventDetails from './pages/AdminEventDetails';
 import CompletedEvents from './pages/CompletedEvents';
 import http from './http';
 import UserContext from './contexts/UserContext';
@@ -83,9 +83,9 @@ function App() {
                       Create Event
                     </Link>
                   </MenuItem>
-                  <MenuItem onClick={handleClose}>
+                  <MenuItem onClick={handleEventsMenuClose}>
                     <Link to="/completedevents" style={{ textDecoration: 'none', color: 'inherit' }}>
-                      Completed Events                   
+                      Completed Events
                     </Link>
                   </MenuItem>
                   {user && (
@@ -118,9 +118,44 @@ function App() {
               <Route path="/" element={<Events />} />
               <Route path="/events" element={<Events />} />
               <Route path="/createevent" element={<CreateEvent />} />
+              <Route path="/event/:id" element={<EventDetails />} />
+              <Route path="/editevent/:id" element={<EditEvent />} />
+              <Route path="/admin/events" element={<AdminEvents />} />
+              <Route path="/admin/event/:id" element={<AdminEventDetails />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/form" element={<MyForm />} />
+              <Route path="/donations" element={<Donations />} />
+              <Route path="/makedonations" element={<Makedon />} />
+              <Route path="/makedonations/:id" element={<Makedon />} />
+              <Route path="/viewdonations" element={<Viewdon />} />
+              <Route path="/viewdonation/:id" element={<Viewdonstaff />} />
+              <Route path="/updatedonations/:id" element={<Updatedon />} />
+              <Route path="/checkout/:id" element={<Checkout />} />
+              <Route path="/receipt/:id" element={<ReceiptPage />} />
+              <Route path="/users" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserTable />
+                </ProtectedRoute>}
+              />
+              <Route path="/users/edit/:id" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserTableEdit />
+                </ProtectedRoute>} />
+              <Route path="/addannouncement" element={<AddAnnouncement />} />
+              <Route path="/editannouncement/:id" element={<EditAnnouncement />} />
+              <Route path="/announcements" element={<Announcements />} />
+              <Route path="/createfacilities" element={<CreateFacilities />} />
+              <Route path="/editfacilities/:id" element={<EditFacilities />} />
+              <Route path="/facilities" element={<Facilities />} />
+              <Route path="/contactus" element={<ContactUs />} />
+              <Route path="/contactmessages" element={<ContactMessages />} />
+              <Route path="/userfacilities" element={<UserFacilities />} />
+              <Route path="/userdonations" element={
+                <ProtectedRoute requiredRole="staff">
+                  <UserDonation />
+                </ProtectedRoute>}
+              />
               <Route path="/event/:id" element={<EventDetails />} />
               <Route path="/editevent/:id" element={<EditEvent />} />
               <Route path="/admin/events" element={<AdminEvents />} />

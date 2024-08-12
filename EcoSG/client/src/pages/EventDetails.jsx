@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Box, Typography, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import http from '../http';
+import { Box, Typography, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@mui/material';
+import http from '../http'; // Assuming this is where your axios instance is configured
 
 function EventDetails() {
     const { id } = useParams();
@@ -9,19 +9,38 @@ function EventDetails() {
     const [loading, setLoading] = useState(true);
     const [signedUp, setSignedUp] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
+    const [error, setError] = useState(null);
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        http.get(`/event/${id}`).then((res) => {
-            setEvent(res.data);
-            setLoading(false);
-        });
+        // Fetch event details
+        http.get(`/event/${id}`)
+            .then((res) => {
+                setEvent(res.data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                setLoading(false);
+                setError('Failed to load event details.');
+            });
 
-        // Check if the user has already signed up for this event
-        http.get(`/event/${id}/check-signup`).then((res) => {
-            if (res.data.signedUp) {
-                setSignedUp(true);
-            }
-        });
+        // Fetch user data
+        http.get('/user/auth')
+            .then((res) => {
+                setUser(res.data.user);
+            })
+            .catch((err) => {
+                setError('Failed to load user data.');
+            });
+
+        // Check if the user has already signed up
+        http.get(`/event/${id}/check-signup`)
+            .then((res) => {
+                setSignedUp(res.data.signedUp);
+            })
+            .catch((err) => {
+                setError('Failed to check sign-up status.');
+            });
     }, [id]);
 
     const handleSignUp = () => {
@@ -29,19 +48,27 @@ function EventDetails() {
         http.post(`/event/${id}/signup`)
             .then((res) => {
                 setSignedUp(true);
+                setError(null);
             })
             .catch((err) => {
-                alert('Failed to sign up for the event');
+                setError('Failed to sign up for the event.');
             });
     };
 
     if (loading) {
-        return <Typography>Loading...</Typography>;
+        return <CircularProgress />;
+    }
+
+    if (error) {
+        return <Typography color="error">{error}</Typography>;
     }
 
     if (!event.title) {
         return <Typography>Event not found</Typography>;
     }
+
+    // Check if the current user is the creator of the event
+    const isEventCreator = user && event.user && user.id === event.user.id;
 
     return (
         <Box sx={{ p: 2 }}>
@@ -64,13 +91,10 @@ function EventDetails() {
                 Time: {event.time || 'N/A'}
             </Typography>
             <Typography variant="h6" sx={{ mb: 2 }}>
-                Duration in Hours: {event.duration || 'N/A'}
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 2 }}>
                 Location: {event.location || 'N/A'}
             </Typography>
             <Typography variant="h6" sx={{ mb: 2 }}>
-                Max Pax: {event.maxPax || 'N/A'}
+                Max Participants: {event.maxPax || 'N/A'}
             </Typography>
             <Typography variant="h6" sx={{ mb: 2 }}>
                 Facilities: {event.facilities || 'N/A'}
@@ -78,40 +102,41 @@ function EventDetails() {
             <Typography variant="h6" sx={{ mb: 2 }}>
                 Manpower: {event.manpower || 'N/A'}
             </Typography>
-            <Typography variant="body1" sx={{ mt: 2 }}>
-                {event.description || 'N/A'}
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-                <Link to="/events" style={{ textDecoration: 'none' }}>
-                    <Button variant="contained">Back to Events</Button>
-                </Link>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => setOpenDialog(true)}
-                    disabled={signedUp}
-                    sx={{ ml: 2, bgcolor: signedUp ? 'grey' : 'primary.main' }}
-                >
-                    {signedUp ? 'Signed Up' : 'Sign Up'}
-                </Button>
-            </Box>
-            <Dialog
-                open={openDialog}
-                onClose={() => setOpenDialog(false)}
-            >
-                <DialogTitle>Sign Up</DialogTitle>
+
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <DialogTitle>Sign Up for Event</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Are you sure you want to sign up for this event?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-                    <Button onClick={handleSignUp} autoFocus>
-                        Continue
+                    <Button onClick={() => setOpenDialog(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSignUp} color="primary">
+                        Sign Up
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                <Link to="/events">
+                    <Button variant="contained">Back to Events</Button>
+                </Link>
+
+                {!isEventCreator && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => setOpenDialog(true)}
+                        disabled={signedUp}
+                        sx={{ backgroundColor: signedUp ? 'grey' : undefined }}
+                    >
+                        {signedUp ? 'Signed Up' : 'Sign Up'}
+                    </Button>
+                )}
+            </Box>
         </Box>
     );
 }

@@ -97,20 +97,18 @@ function Events() {
                                                 {event.title}
                                             </Typography>
                                         </Link>
-                                        {
-                                            user && user.id === event.userId && (
-                                                <>
-                                                    <Link to={`/editevent/${event.id}`} style={{ position: 'absolute', top: 8, right: 8, textDecoration: 'none' }}>
-                                                        <IconButton color="primary" sx={{ padding: '4px' }} aria-label="Edit event">
-                                                            <Edit />
-                                                        </IconButton>
-                                                    </Link>
-                                                    <IconButton color="error" onClick={() => deleteEvent(event.id)} sx={{ position: 'absolute', bottom: 8, right: 8, padding: '4px' }} aria-label="Delete event">
-                                                        <Delete />
+                                        {user && user.id === event.userId && ( // Check if user is logged in and is the creator
+                                            <>
+                                                <Link to={`/editevent/${event.id}`} style={{ position: 'absolute', top: 8, right: 8, textDecoration: 'none' }}>
+                                                    <IconButton color="primary" sx={{ padding: '4px' }} aria-label="Edit event">
+                                                        <Edit />
                                                     </IconButton>
-                                                </>
-                                            )
-                                        }
+                                                </Link>
+                                                <IconButton color="error" onClick={() => deleteEvent(event.id)} sx={{ position: 'absolute', bottom: 8, right: 8, padding: '4px' }} aria-label="Delete event">
+                                                    <Delete />
+                                                </IconButton>
+                                            </>
+                                        )}
                                     </Box>
                                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }} color="text.secondary">
                                         <AccessTime sx={{ mr: 1 }} />
