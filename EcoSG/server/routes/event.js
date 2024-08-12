@@ -4,11 +4,14 @@ const { User, Event, EventParticipant } = require('../models');
 const { Op } = require('sequelize');
 const yup = require('yup');
 const { validateToken } = require('../middlewares/auth');
+const sendRewardEmail = require('../utils/emailService');
+
 
 // Create Event
 router.post("/", validateToken, async (req, res) => {
     const {
         title,
+        type,
         description,
         organisers,
         status,
@@ -18,12 +21,16 @@ router.post("/", validateToken, async (req, res) => {
         maxPax,
         facilities,
         manpower,
-        userId
     } = req.body;
 
+    // Extract userId from authenticated user's information
+    const userId = req.user.id;
+
     try {
+        // Create the event with userId associated with the current user
         const event = await Event.create({
             title,
+            type,
             description,
             organisers,
             status,
@@ -33,7 +40,7 @@ router.post("/", validateToken, async (req, res) => {
             maxPax,
             facilities,
             manpower,
-            userId
+            userId // Assign the userId from req.user
         });
         res.json(event);
     } catch (error) {
@@ -205,6 +212,35 @@ router.get('/signed-up-events', validateToken, async (req, res) => {
         res.json(signedUpEvents.map(participant => participant.Event));
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Add this to your routes/events.js
+
+router.post('/:id/collect-reward', async (req, res) => {
+    const eventId = req.params.id;
+    const userId = req.user.id;
+
+    try {
+        // Verify that the user has signed up for the event and the event status is completed
+        const signup = await EventParticipant.findOne({ where: { eventId, userId } });
+        const event = await Event.findByPk(eventId);
+
+        if (signup && event && event.status === 'Completed') {
+            // Implement reward collection logic here
+            // For now, just send a success response
+            res.status(200).json({ message: 'Reward collected successfully!' });
+
+            // Email notification logic (send email)
+            const user = await User.findByPk(userId);
+            if (user) {
+                sendEmail(user.email, `Congratulations on completing ${event.title}`);
+            }
+        } else {
+            res.status(400).json({ message: 'Cannot collect reward.' });
+        }
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error.' });
     }
 });
 

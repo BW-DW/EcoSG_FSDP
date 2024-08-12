@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Typography, Grid, Card, CardContent, Input, IconButton, Button } from '@mui/material';
-import { AccessTime, Search, Clear, Edit, Delete } from '@mui/icons-material';
+import { Search, Clear, Edit, Delete } from '@mui/icons-material';
 import http from '../http';
 import dayjs from 'dayjs';
 import UserContext from '../contexts/UserContext';
@@ -63,7 +63,7 @@ function Events() {
 
     const groupedEvents = orderedStatuses.reduce((groups, status) => {
         groups[status] = eventList
-            .filter(event => !createdEvents.includes(event) && event.status === status);
+            .filter(event => event.status === status && event.userId !== user.id); // Exclude created events
         return groups;
     }, {});
 
@@ -77,61 +77,20 @@ function Events() {
                 <Input value={search} placeholder="Search"
                     onChange={onSearchChange}
                     onKeyDown={onSearchKeyDown} />
-                <IconButton color="primary"
-                    onClick={onClickSearch}>
+                <IconButton color="primary" onClick={onClickSearch}>
                     <Search />
                 </IconButton>
-                <IconButton color="primary"
-                    onClick={onClickClear}>
+                <IconButton color="primary" onClick={onClickClear}>
                     <Clear />
                 </IconButton>
                 <Box sx={{ flexGrow: 1 }} />
-                {
-                    user && (
-                        <Link to="/createevent" style={{ textDecoration: 'none' }}>
-                            <Button variant='contained'>
-                                Add
-                            </Button>
-                        </Link>
-                    )
-                }
+                {user && (
+                    <Link to="/createevent" style={{ textDecoration: 'none' }}>
+                        <Button variant='contained'>Add</Button>
+                    </Link>
+                )}
             </Box>
 
-<<<<<<< Updated upstream
-            <Grid container spacing={2}>
-                {
-                    eventList.map((event) => (
-                        <Grid item xs={12} md={6} lg={4} key={event.id}>
-                            <Card sx={{ position: 'relative' }}>
-                                <CardContent>
-                                    <Box sx={{ display: 'flex', mb: 1 }}>
-                                        <Link to={`/event/${event.id}`} style={{ textDecoration: 'none', flexGrow: 1 }}>
-                                            <Typography variant="h6">
-                                                {event.title}
-                                            </Typography>
-                                        </Link>
-                                        {user && user.id === event.userId && ( // Check if user is logged in and is the creator
-                                            <>
-                                                <Link to={`/editevent/${event.id}`} style={{ position: 'absolute', top: 8, right: 8, textDecoration: 'none' }}>
-                                                    <IconButton color="primary" sx={{ padding: '4px' }} aria-label="Edit event">
-                                                        <Edit />
-                                                    </IconButton>
-                                                </Link>
-                                                <IconButton color="error" onClick={() => deleteEvent(event.id)} sx={{ position: 'absolute', bottom: 8, right: 8, padding: '4px' }} aria-label="Delete event">
-                                                    <Delete />
-                                                </IconButton>
-                                            </>
-                                        )}
-                                    </Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }} color="text.secondary">
-                                        <AccessTime sx={{ mr: 1 }} />
-                                        <Typography>
-                                            {dayjs(event.date).format(global.datetimeFormat)} {event.time}
-                                        </Typography>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-=======
             {/* Created Events Section */}
             {createdEvents.length > 0 && (
                 <Box sx={{ mb: 4, backgroundColor: 'green', p: 2, borderRadius: 1 }}>
@@ -263,7 +222,6 @@ function Events() {
                                     </Card>
                                 </Grid>
                             ))}
->>>>>>> Stashed changes
                         </Grid>
                     </Box>
                 )

@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-<<<<<<< Updated upstream
-import { Box, Typography, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@mui/material';
-import http from '../http'; // Assuming this is where your axios instance is configured
-=======
-import { Box, Typography, Button, Divider, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Box, Typography, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress, Divider } from '@mui/material';
 import http from '../http';
->>>>>>> Stashed changes
 
 function EventDetails() {
     const { id } = useParams();
@@ -16,6 +11,7 @@ function EventDetails() {
     const [openDialog, setOpenDialog] = useState(false);
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null);
+    const [collectReward, setCollectReward] = useState(false);
 
     useEffect(() => {
         // Fetch event details
@@ -42,6 +38,9 @@ function EventDetails() {
         http.get(`/event/${id}/check-signup`)
             .then((res) => {
                 setSignedUp(res.data.signedUp);
+                if (res.data.signedUp && res.data.eventStatus === 'Completed') {
+                    setCollectReward(true);
+                }
             })
             .catch((err) => {
                 setError('Failed to check sign-up status.');
@@ -57,6 +56,16 @@ function EventDetails() {
             })
             .catch((err) => {
                 setError('Failed to sign up for the event.');
+            });
+    };
+
+    const handleCollectReward = () => {
+        http.post(`/event/${id}/collect-reward`)
+            .then((res) => {
+                alert('Reward collected successfully!');
+            })
+            .catch((err) => {
+                setError('Failed to collect reward.');
             });
     };
 
@@ -146,29 +155,6 @@ function EventDetails() {
             <Typography variant="h6" sx={{ mb: 2 }}>
                 Description
             </Typography>
-<<<<<<< Updated upstream
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Date: {event.date || 'N/A'}
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Time: {event.time || 'N/A'}
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Location: {event.location || 'N/A'}
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Max Participants: {event.maxPax || 'N/A'}
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Facilities: {event.facilities || 'N/A'}
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Manpower: {event.manpower || 'N/A'}
-            </Typography>
-
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                <DialogTitle>Sign Up for Event</DialogTitle>
-=======
             <Typography variant="body1">
                 {event.description || 'N/A'}
             </Typography>
@@ -178,22 +164,38 @@ function EventDetails() {
                 <Link to="/events" style={{ textDecoration: 'none' }}>
                     <Button variant="contained">Back to Events</Button>
                 </Link>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => setOpenDialog(true)}
-                    disabled={signedUp}
-                    sx={{ ml: 2, bgcolor: signedUp ? 'grey' : 'primary.main' }}
-                >
-                    {signedUp ? 'Signed Up' : 'Sign Up'}
-                </Button>
+
+                {isEventCreator ? null : event.status === 'Completed' && signedUp ? (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleCollectReward}
+                    >
+                        Collect Reward
+                    </Button>
+                ) : event.status === 'Ongoing' || event.status === 'Completed' ? (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        disabled
+                    >
+                        {event.status}
+                    </Button>
+                ) : (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => setOpenDialog(true)}
+                        disabled={signedUp}
+                        sx={{ backgroundColor: signedUp ? 'grey' : undefined }}
+                    >
+                        {signedUp ? 'Signed Up' : 'Sign Up'}
+                    </Button>
+                )}
             </Box>
-            <Dialog
-                open={openDialog}
-                onClose={() => setOpenDialog(false)}
-            >
+
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Sign Up</DialogTitle>
->>>>>>> Stashed changes
                 <DialogContent>
                     <DialogContentText>
                         Are you sure you want to sign up for this event?
@@ -208,24 +210,6 @@ function EventDetails() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
-            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                <Link to="/events">
-                    <Button variant="contained">Back to Events</Button>
-                </Link>
-
-                {!isEventCreator && (
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => setOpenDialog(true)}
-                        disabled={signedUp}
-                        sx={{ backgroundColor: signedUp ? 'grey' : undefined }}
-                    >
-                        {signedUp ? 'Signed Up' : 'Sign Up'}
-                    </Button>
-                )}
-            </Box>
         </Box>
     );
 }
