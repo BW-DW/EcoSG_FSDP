@@ -39,6 +39,14 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
+// Set up associations manually for the new EventParticipant model
+const User = db.User;
+const Event = db.Event;
+const EventParticipant = db.EventParticipant;
+
+User.belongsToMany(Event, { through: EventParticipant, foreignKey: 'userId' });
+Event.belongsToMany(User, { through: EventParticipant, foreignKey: 'eventId' });
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
