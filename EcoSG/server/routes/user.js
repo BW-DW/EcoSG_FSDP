@@ -86,35 +86,53 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: errorMsg });
         }
 
-        // Generate a 2FA code
-        const twoFACode = crypto.randomInt(100000, 999999).toString();
+        // Check if the user is verified
+        if (user.verified) {
+            // Generate a 2FA code
+            const twoFACode = crypto.randomInt(100000, 999999).toString();
 
-        // Store user info and 2FA code temporarily
-        tempDataStore.set(user.email, { userInfo: user, twoFACode });
+            // Store user info and 2FA code temporarily
+            tempDataStore.set(user.email, { userInfo: user, twoFACode });
 
-        // Send the 2FA code via email
-        const mailOptions = {
-            from: 'bwgyanimate@gmail.com',
-            to: user.email,
-            subject: 'Your 2FA Code',
-            text: `Your 2FA verification code is: ${twoFACode}`,
-            html: `<p>Your 2FA verification code is: <strong>${twoFACode}</strong></p>`
-        };
+            // Send the 2FA code via email
+            const mailOptions = {
+                from: process.env.SMTP_USER,
+                to: user.email,
+                subject: 'Your 2FA Code',
+                text: `Your 2FA verification code is: ${twoFACode}`,
+                html: `<p>Your 2FA verification code is: <strong>${twoFACode}</strong></p>`
+            };
 
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('Error sending 2FA email:', error);
-                return res.status(500).json({ message: 'Error sending 2FA code. Please try again.' });
-            }
-            console.log('2FA email sent:', info.response);
-        });
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Error sending 2FA email:', error);
+                    return res.status(500).json({ message: 'Error sending 2FA code. Please try again.' });
+                }
+                console.log('2FA email sent:', info.response);
+            });
 
-        // Respond with a message indicating that 2FA is required
-        return res.status(200).json({
-            message: "A 2FA code has been sent to your email. Please verify to proceed.",
-            twoFANeeded: true,
-            email: user.email
-        });
+            // Respond with a message indicating that 2FA is required
+            return res.status(200).json({
+                message: "A 2FA code has been sent to your email. Please verify to proceed.",
+                twoFANeeded: true,
+                email: user.email
+            });
+        } else {
+            // If user is not verified, log them in directly without 2FA
+            const userInfo = {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                dob: user.dob,
+                role: user.role
+            };
+            let accessToken = sign(userInfo, process.env.APP_SECRET, { expiresIn: process.env.TOKEN_EXPIRES_IN });
+
+            return res.json({
+                accessToken: accessToken,
+                user: userInfo
+            });
+        }
 
     } catch (err) {
         return res.status(400).json({ errors: err.errors });
