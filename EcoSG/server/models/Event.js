@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         type: {
-            type: DataTypes.STRING, // Add this line
-            allowNull: true // Set to `false` if required
+            type: DataTypes.STRING,
+            allowNull: true
         },
         description: {
             type: DataTypes.TEXT,

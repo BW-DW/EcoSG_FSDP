@@ -46,10 +46,14 @@ function CreateEvent() {
         onSubmit: (data) => {
             data.title = data.title.trim();
             data.description = data.description.trim();
+            // userId is not needed here; it will be handled by backend
             http.post("/event", data)
                 .then((res) => {
                     setEventName(data.title);
                     setOpen(true);
+                })
+                .catch((err) => {
+                    console.error("Error creating event:", err);
                 });
         }
     });
