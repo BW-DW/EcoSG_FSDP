@@ -13,7 +13,6 @@ import EditEvent from './pages/EditEvent';
 import EventDetails from './pages/EventDetails';
 import AdminEvents from './pages/AdminEvents';
 import AdminEventDetails from './pages/AdminEventDetails';
-import CompletedEvents from './pages/CompletedEvents';
 import http from './http';
 import UserContext from './contexts/UserContext';
 
@@ -81,11 +80,6 @@ function App() {
                   <MenuItem onClick={handleClose}>
                     <Link to="/createevent" style={{ textDecoration: 'none', color: 'inherit' }}>
                       Create Event
-                    </Link>
-                  </MenuItem>
-                  <MenuItem onClick={handleEventsMenuClose}>
-                    <Link to="/completedevents" style={{ textDecoration: 'none', color: 'inherit' }}>
-                      Completed Events
                     </Link>
                   </MenuItem>
                   {user && (
@@ -160,7 +154,6 @@ function App() {
               <Route path="/editevent/:id" element={<EditEvent />} />
               <Route path="/admin/events" element={<AdminEvents />} />
               <Route path="/admin/event/:id" element={<AdminEventDetails />} />
-              <Route path="/completedevents" element={<CompletedEvents />} />
             </Routes>
           </Container>
         </ThemeProvider>
