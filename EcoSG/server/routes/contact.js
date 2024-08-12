@@ -31,7 +31,33 @@ router.post("/contactmessages", async (req, res) => {
   }
   app.post('/contact', saveContactMessage);
 });
+router.post("/contactmessages/:id/reply", async (req, res) => {
+  const contactMessageId = req.params.id;
+  const replyMessage = req.body.replyMessage;
 
+  // Validate reply message
+  const replyValidationSchema = yup.string().trim().max(500).required();
+  let validatedReplyMessage;
+  try {
+    validatedReplyMessage = await replyValidationSchema.validate(replyMessage);
+  } catch (err) {
+    console.error("Error validating reply message:", err);
+    res.status(400).json({ errors: err.errors });
+    return;
+  }
+
+  // Find the contact message to reply to
+  const contactMessage = await Contact.findByPk(contactMessageId);
+  if (!contactMessage) {
+    res.sendStatus(404);
+    return;
+  }
+
+  // Send reply email
+  await sendContactUsEmail(contactMessage.email, contactMessage.name, validatedReplyMessage);
+
+  res.json({ message: "Reply email sent successfully." });
+});
 // Get all contact messages API
 router.get("/contactmessages", async (req, res) => {
   let condition = {};

@@ -12,13 +12,29 @@ const transporter = nodemailer.createTransport({
 });
 
 // Function to send the contact us email
-const sendContactUsEmail = async (toEmail, userName) => {
-    const mailOptions = {
+const sendContactUsEmail = async (toEmail, userName,replyMessage) => {
+    let mailOptions;
+    if (replyMessage){
+        mailOptions = {
+            from: 'process.env.EMAIL_USER',
+            to: toEmail,
+            subject: 'Re: Your Message to Eco SG',
+            text: `
+            Dear ${userName},
+      
+            ${replyMessage}
+      
+            Best regards,
+            Eco SG
+            `,
+          };
+    } else{
+    mailOptions = {
         from: process.env.EMAIL_USER,
         to: toEmail,
         subject: 'Thank you for contacting us!',
         text: `Dear ${userName},\n\nThank you for reaching out to us. We have received your message and will get back to you shortly.\n\nBest regards,\nEco SG`,
-    };
+    }};
 
     try {
         await transporter.sendMail(mailOptions);
