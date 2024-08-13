@@ -49,7 +49,7 @@ function Events() {
 
     const deleteEvent = (id) => {
         if (window.confirm('Are you sure you want to delete this event?')) {
-            http.delete(`/event/${id}`).then(() => {
+            http.put(`/event/${id}/delete`).then(() => {
                 setEventList(eventList.filter(event => event.id !== id));
             });
         }
@@ -94,7 +94,7 @@ function Events() {
             {/* Created Events Section */}
             {createdEvents.length > 0 && (
                 <Box sx={{ mb: 4, backgroundColor: 'green', p: 2, borderRadius: 1 }}>
-                    <Typography variant="h6" sx={{ mb: 2, color: 'white' }}>
+                    <Typography variant="h6" align='center' sx={{ mb: 2, color: 'white' }}>
                         Created Events
                     </Typography>
                     <Grid container spacing={2} justifyContent="center">
@@ -139,7 +139,7 @@ function Events() {
                                         </Box>
                                     </CardContent>
                                     {/* Edit and Delete Buttons */}
-                                    {user && user.id === event.userId && (
+                                    {(user && user.id === event.userId) || (user && user.role === 'staff') && (
                                         <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
                                             <Link to={`/editevent/${event.id}`} style={{ textDecoration: 'none' }}>
                                                 <IconButton color="primary" aria-label="Edit event">
@@ -162,7 +162,7 @@ function Events() {
             {orderedStatuses.map((status) => (
                 groupedEvents[status].length > 0 && (
                     <Box key={status} sx={{ mb: 4, backgroundColor: 'green', p: 2, borderRadius: 1 }}>
-                        <Typography variant="h6" sx={{ mb: 2, color: 'white' }}>
+                        <Typography variant="h6" align='center' sx={{ mb: 2, color: 'white' }}>
                             {status}
                         </Typography>
                         <Grid container spacing={2} justifyContent="center">
@@ -207,7 +207,7 @@ function Events() {
                                             </Box>
                                         </CardContent>
                                         {/* Edit and Delete Buttons */}
-                                        {user && user.id === event.userId && (
+                                        {(user && user.id === event.userId) || (user && user.role === 'staff') && (
                                             <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
                                                 <Link to={`/editevent/${event.id}`} style={{ textDecoration: 'none' }}>
                                                     <IconButton color="primary" aria-label="Edit event">

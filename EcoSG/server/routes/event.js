@@ -6,7 +6,6 @@ const yup = require('yup');
 const { validateToken } = require('../middlewares/auth');
 const sendRewardEmail = require('../utils/emailService');
 
-
 // Create Event
 router.post("/", validateToken, async (req, res) => {
     const {
@@ -98,8 +97,8 @@ router.put("/:id", validateToken, async (req, res) => {
             return res.sendStatus(404);
         }
 
-        let userId = req.user.id;
-        if (event.userId != userId) {
+        // Check if the user is a staff member or the event creator
+        if (req.user.role !== 'staff' && req.user.id !== event.userId) {
             return res.sendStatus(403);
         }
 
@@ -123,7 +122,7 @@ router.put("/:id", validateToken, async (req, res) => {
 });
 
 // Delete Event
-router.delete("/:id", validateToken, async (req, res) => {
+router.put("/:id/delete", validateToken, async (req, res) => {
     let id = req.params.id;
 
     try {
@@ -132,8 +131,8 @@ router.delete("/:id", validateToken, async (req, res) => {
             return res.sendStatus(404);
         }
 
-        let userId = req.user.id;
-        if (event.userId != userId) {
+        // Check if the user is a staff member or the event creator
+        if (req.user.role !== 'staff' && req.user.id !== event.userId) {
             return res.sendStatus(403);
         }
 
@@ -215,9 +214,8 @@ router.get('/signed-up-events', validateToken, async (req, res) => {
     }
 });
 
-// Add this to your routes/events.js
-
-router.post('/:id/collect-reward', async (req, res) => {
+// Collect Reward
+router.post('/:id/collect-reward', validateToken, async (req, res) => {
     const eventId = req.params.id;
     const userId = req.user.id;
 
@@ -234,7 +232,7 @@ router.post('/:id/collect-reward', async (req, res) => {
             // Email notification logic (send email)
             const user = await User.findByPk(userId);
             if (user) {
-                sendEmail(user.email, `Congratulations on completing ${event.title}`);
+                sendRewardEmail(user.email, `Congratulations on completing ${event.title}`);
             }
         } else {
             res.status(400).json({ message: 'Cannot collect reward.' });
