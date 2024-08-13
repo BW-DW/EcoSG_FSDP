@@ -33,7 +33,7 @@ function ContactUs() {
           .then((res) => {
             console.log(res.data);
             toast.success('Message sent successfully!');
-            navigate('/contactmessages');
+            navigate('/contactUs');
           })
           .catch((error) => {
             console.error('Error sending message:', error.response);
